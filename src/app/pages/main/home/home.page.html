@@ -1,0 +1,37 @@
+<div class="home">
+  <img class="home--logo" src="assets/images/logo.svg">
+  <div class="home--hello">
+    <p>Oi, <label>{{ user.name }}</label></p>
+  </div>
+  <h3 style="width: 100%; text-align: start;">Selecione o tipo de ocorrência</h3>
+  <div class="home--occurrence">
+    <div class="home--occurrence--type" (click)="redirectToType('0')">
+      <div class="home--occurrence--type--align">
+        <img src="assets/images/occurrence/batida.svg">
+        <p>Acidente de trânsito</p>
+      </div>
+      <img src="assets/images/occurrence/arrow.svg">
+    </div>
+    <div class="home--occurrence--type" (click)="redirectToType('1')">
+      <div class="home--occurrence--type--align">
+        <img src="assets/images/occurrence/incendio.svg">
+        <p>Incêndio</p>
+      </div>
+      <img src="assets/images/occurrence/arrow.svg">
+    </div>
+    <div class="home--occurrence--type" (click)="redirectToType('2')">
+      <div class="home--occurrence--type--align">
+        <img src="assets/images/occurrence/desmoronamento.svg">
+        <p>Desmoronamento</p>
+      </div>
+      <img src="assets/images/occurrence/arrow.svg">
+    </div>
+    <a href="tel:+5515996409619" class="home--occurrence--type">
+      <div class="home--occurrence--type--align">
+        <img src="assets/images/occurrence/policia.svg">
+        <p>Policia</p>
+      </div>
+      <img src="assets/images/occurrence/arrow.svg">
+    </a>
+  </div>
+</div>

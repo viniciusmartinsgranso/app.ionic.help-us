@@ -1,0 +1,52 @@
+.logout {
+  background: var(--black-color);
+  width: 100%;
+  height: 100%;
+  padding: 2rem 2rem 2rem 2rem;
+  overflow: auto;
+
+  &--page {
+    text-align: center;
+
+    &--devs {
+      display: flex;
+      overflow: auto;
+      gap: 2rem;
+
+      img {
+        width: 12rem;
+        height: 12rem;
+        border: .2rem dashed var(--yellow-color);
+        border-radius: 2rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    &--buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+  }
+}
+
+.no {
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: 0.2rem dashed var(--yellow-color);
+  font-size: 1.2rem;
+  border-radius: 0.5rem;
+  padding: 1rem 1rem;
+}
+
+.yes {
+  width: 100%;
+  height: 100%;
+  background: var(--yellow-color);
+  font-size: 1.2rem;
+  border-radius: 0.5rem;
+  color: var(--black-color);
+  padding: 1rem 1rem;
+}

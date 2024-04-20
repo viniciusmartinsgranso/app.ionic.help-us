@@ -1,0 +1,45 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.finish-occurrence {
+  width: 90vw;
+  height: 45vh;
+  background: var(--black-color);
+  border-radius: 0.7rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  padding: 2rem;
+
+  img {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.7rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.2rem;
+    width: 65vw;
+    color: #C0C0C0;
+    text-align: center;
+  }
+
+  button {
+    width: 100%;
+    padding: 1.2rem 0;
+    font-size: 1.2rem;
+    border-radius: 0.5rem;
+    background: var(--yellow-color);
+    color: black;
+  }
+}

@@ -1,0 +1,21 @@
+<div class="feed">
+  <ng-template *ngIf="occurrenceList.length === 0" [ngTemplateOutlet]="empty"></ng-template>
+  <ng-template *ngIf="occurrenceList.length >= 1" [ngTemplateOutlet]="list"></ng-template>
+
+  <ng-template #list>
+    <div class="feed--item">
+      <app-feed-occurrence *ngFor="let occurrence of occurrenceList"
+        [occurrence]="occurrence"
+      ></app-feed-occurrence>
+    </div>
+  </ng-template>
+
+
+  <ng-template #empty>
+    <div class="feed--empty">
+      <img src="assets/images/sirene.svg">
+      <h3>Não possuem ocorrências no momento</h3>
+    </div>
+  </ng-template>
+
+</div>

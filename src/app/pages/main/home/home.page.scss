@@ -1,0 +1,64 @@
+.home {
+  background: var(--black-color);
+  width: 100%;
+  height: 100%;
+  padding: 2rem 2rem 13vh 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  overflow: auto;
+
+  &--hello {
+    font-size: 1.6rem;
+    width: 100%;
+
+    p {
+      margin: 0;
+    }
+
+    label {
+      color: var(--yellow-color);
+    }
+  }
+
+  &--logo {
+    width: 14rem;
+    height: 8rem;
+  }
+
+  &--occurrence {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+
+    &--type {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      background: var(--yellow-color);
+      border-radius: 0.5rem;
+      font-size: 1.4rem;
+      color: black;
+      padding: 1.2rem .8rem 1.2rem 1rem;
+      text-align: center;
+
+      &--align {
+        display: flex;
+        align-items: center;
+
+        img {
+          width: 2rem;
+          height: 2rem;
+        }
+
+        p {
+          margin: 0 0 0 1rem;
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+}

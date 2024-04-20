@@ -1,0 +1,43 @@
+<div class="profile">
+  <div class="profile--modal">
+    <div class="profile--modal--content">
+      <div class="profile--modal--content--user">
+
+        <div class="profile--modal--content--user--pic">
+          <img [src]="user?.photoUrl || 'assets/images/user.jpg'">
+        </div>
+
+        <div class="profile--modal--content--user--menu">
+          <img src="assets/images/confirm-exit.svg" (click)="router.navigate(['/logout'])">
+        </div>
+
+        <div class="profile--modal--content--user--labels">
+          <label class="profile--modal--content--user--labels--name">{{ user.name }}</label>
+          <br>
+          <label class="profile--modal--content--user--labels--job">{{ user.city }}</label>
+        </div>
+
+      </div>
+
+      <div class="profile--modal--content--posts">
+        <div class="profile--modal--content--posts--title">
+          <h4 style="font-weight: bold;">MINHAS OCORRENCIAS</h4>
+        </div>
+
+        <ng-template *ngIf="occurrences" [ngTemplateOutlet]="posts"></ng-template>
+        <ng-template *ngIf="!occurrences" [ngTemplateOutlet]="empty"></ng-template>
+        <ng-template #posts>
+          <div class="profile--modal--content--posts--my-posts">
+            <app-feed-occurrence *ngFor="let posts of occurrences" [occurrence]="posts"></app-feed-occurrence>
+          </div>
+        </ng-template>
+        <ng-template #empty>
+          <div>
+            <h3 style="color: grey">Você ainda não possui ocorrência :(</h3>
+          </div>
+        </ng-template>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="feed-occurrence">
+  <div class="feed-occurrence--header">
+    <div class="feed-occurrence--header--occurrence-image">
+      <img [src]="typeTranslate[occurrence.type]">
+    </div>
+    <div class="feed-occurrence--header--user" *ngIf="occurrence?.user">
+      <ion-avatar>
+        <img [src]="occurrence?.user?.photoUrl ?? 'assets/images/user.jpg'">
+      </ion-avatar>
+      <div class="feed-occurrence--header--user--detail">
+        <label class="feed-occurrence--header--user--detail--name">{{ occurrence?.user?.name || 'Vini' }}</label>
+        <label class="feed-occurrence--header--user--detail--location">{{ occurrence?.user?.city }}</label>
+      </div>
+    </div>
+  </div>
+  <div class="feed-occurrence--content">
+    <div class="feed-occurrence--content--title">
+      {{ occurrence.title }}, {{ occurrence.location }}
+    </div>
+    <div class="feed-occurrence--content--description">
+      {{ occurrence.description }}
+    </div>
+    <img *ngIf="occurrence.photoUrl" class="feed-occurrence--content--img" [src]="occurrence.photoUrl">
+  </div>
+</div>
