@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { FinishOccurrenceComponent } from '../../../components/modals/finish-occurence/finish-occurrence.component';
 import { OccurrenceTypeEnum, occurrenceTypeTranslate } from '../../../models/enums/occurrence-type.enum';
 import { OccurrenceProxy } from '../../../models/proxies/occurrence.proxy';
 import { OccurrenceService } from '../../../services/occurrence.service';
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { HelperService } from "../../../services/helper";
 
 @Component({
   selector: 'app-new-occurrence',
@@ -14,41 +16,30 @@ import { OccurrenceService } from '../../../services/occurrence.service';
 export class NewOccurrencePage {
 
   constructor(
-    private readonly activatedRoute: ActivatedRoute,
-    private readonly modalController: ModalController,
-    private readonly occurrenceService: OccurrenceService,
+    private readonly formBuilder: FormBuilder,
   ) {
-    // const lastItem = JSON.parse(localStorage.getItem('occurrences'));
-    // this.occurrence.id = lastItem[lastItem.length - 1].id + 1;
-    //
-    // this.occurrence.user = JSON.parse(localStorage.getItem('loggedUser'));
+    this.formGroup = this.formBuilder.nonNullable.group({
+      title: ['', [Validators.required, Validators.minLength(4)]],
+      description: ['', [Validators.required, Validators.minLength(4)]],
+      location: ['', [Validators.required, Validators.minLength(4)]],
+      type: [],
+      photoUrl: ['']
+    });
   }
 
-  public type: OccurrenceTypeEnum = this.activatedRoute.snapshot.params['type'];
+  private readonly occurrenceService: OccurrenceService = inject(OccurrenceService);
 
-  public loggedUser: any;
+  private readonly modalController: ModalController = inject(ModalController);
 
-  // public occurrence: OccurrenceProxy = {
-  //   id: 4,
-  //   title: '',
-  //   description: '',
-  //   location: '',
-  //   photoUrl: '',
-  //   type: this.type,
-  // };
+  private readonly activatedRoute: ActivatedRoute = inject(ActivatedRoute);
 
-  public occurrence: OccurrenceProxy = {
-    id: 0,
-    title: '',
-    location: '',
-    description: '',
-    type: this.type,
-    user: undefined,
-  };
+  private readonly helperService: HelperService = inject(HelperService);
+
+  public type: OccurrenceTypeEnum = OccurrenceTypeEnum.COOP;
+
+  public formGroup!: FormGroup;
 
   public typeTranslate: Record<OccurrenceTypeEnum, string> = occurrenceTypeTranslate;
-
-  public occurrenceList: OccurrenceProxy[] = [];
 
   public getBase64(event: any): void {
     const file = event.target.files[0];
@@ -56,7 +47,7 @@ export class NewOccurrencePage {
     reader.readAsDataURL(file);
     reader.onload = () => {
       if (reader.result) {
-        this.occurrence.photoUrl = reader.result.toString();
+        this.formGroup.controls['photoUrl'].setValue(reader.result.toString());
       }
     };
     reader.onerror = error => {
@@ -65,8 +56,17 @@ export class NewOccurrencePage {
   }
 
   public async postNewOccurrence(): Promise<void> {
-    console.log(this.occurrence);
-    this.occurrenceService.create(this.occurrence);
+    const payload = this.formGroup.getRawValue();
+
+    if (payload.photoUrl === '')
+      delete payload.photoUrl;
+
+    payload.type = +this.activatedRoute.snapshot.params['type'];
+    const [ canCreate, message ] = await this.occurrenceService.create(payload);
+
+    if (!canCreate) {
+      return await this.helperService.showToast(message!);
+    }
 
     const modal = await this.modalController.create({
       mode: 'md',
@@ -75,19 +75,6 @@ export class NewOccurrencePage {
     });
 
     await modal.present();
-  }
-
-  public canPost(): boolean {
-    if (this.occurrence.title.length < 5)
-      return false;
-
-    if (this.occurrence.description.length < 5)
-      return false;
-
-    if (this.occurrence.location.length < 5)
-      return false;
-
-    return true;
   }
 
 }

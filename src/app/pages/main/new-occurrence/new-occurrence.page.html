@@ -1,4 +1,4 @@
-<div class="new-occurrence">
+<form class="new-occurrence" [formGroup]="formGroup">
   <div class="new-occurrence--titles">
     <img src="assets/images/back-arrow.svg" [routerLink]="['/home']">
     <div class="new-occurrence--titles--lables">
@@ -8,20 +8,20 @@
   </div>
   <div class="new-occurrence--form">
     <img class="new-occurrence--form--icon" src="assets/images/text-occurrence.svg" alt="">
-    <input class="new-occurrence--form--input" type="text" placeholder="Título" [(ngModel)]="occurrence.title">
+    <input class="new-occurrence--form--input" type="text" placeholder="Título" formControlName="title">
   </div>
   <div class="new-occurrence--form">
     <img class="description-image" src="assets/images/description-occurrence.svg" alt="">
-    <textarea class="new-occurrence--form--input" placeholder="Descrição" cols="3" rows="10" [(ngModel)]="occurrence.description"></textarea>
+    <textarea class="new-occurrence--form--input" placeholder="Descrição" cols="3" rows="10" formControlName="description"></textarea>
   </div>
   <div class="new-occurrence--form">
     <img class="new-occurrence--form--icon" src="assets/images/location-occurrence.svg" alt="">
-    <input class="new-occurrence--form--input" type="text" [(ngModel)]="occurrence.location" placeholder="Localização">
+    <input class="new-occurrence--form--input" type="text" formControlName="location" placeholder="Localização">
   </div>
-  <div class="new-occurrence--occurrence-image" [style.padding]="!occurrence.photoUrl ? '1rem 0 1rem 0' : '0'">
-    <label *ngIf="!occurrence?.photoUrl;" (click)="inputElement.click()"> Selecionar a imagem da ocorrência</label>
+  <div class="new-occurrence--occurrence-image" [style.padding]="!formGroup.controls['photoUrl'].value ? '1rem 0 1rem 0' : '0'">
+    <label *ngIf="!formGroup.controls['photoUrl'].value" (click)="inputElement.click()"> Selecionar a imagem da ocorrência</label>
     <input #inputElement type="file" accept="image/png, image/jpg, image/jpeg" (change)="getBase64($event)">
-    <img [class.new-occurrence--occurrence-image--img]="occurrence?.photoUrl" [src]="occurrence?.photoUrl">
+    <img [class.new-occurrence--occurrence-image--img]="formGroup.controls['photoUrl'].value" [src]="formGroup.controls['photoUrl']?.value">
   </div>
-  <button class="new-occurrence--submit" (click)="postNewOccurrence()" [class.disable]="!canPost()" >Criar ocorrência</button>
-</div>
+  <button class="new-occurrence--submit" (click)="postNewOccurrence()" [class.disable]="formGroup.invalid" >Criar ocorrência</button>
+</form>

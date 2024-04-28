@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { OccurrenceProxy } from '../../../models/proxies/occurrence.proxy';
 import { OccurrenceService } from '../../../services/occurrence.service';
+import { HelperService } from "../../../services/helper";
 
 @Component({
   selector: 'app-feed',
@@ -9,19 +10,23 @@ import { OccurrenceService } from '../../../services/occurrence.service';
 })
 export class FeedPage implements OnInit {
 
-  constructor(
-    private readonly occurrenceService: OccurrenceService,
-  ) { }
+  private readonly occurrenceService: OccurrenceService = inject(OccurrenceService);
 
-  ngOnInit() {
-    this.getOccurrences();
+  private readonly helperService: HelperService = inject(HelperService);
+
+  public async ngOnInit(): Promise<void> {
+    await this.getOccurrences();
   }
 
   public occurrenceList: OccurrenceProxy[] = [];
 
-  public getOccurrences(): void {
-    // this.occurrenceList = JSON.parse(localStorage.getItem('occurrences'));
-    // console.log(this.occurrenceList);
+  public async getOccurrences(): Promise<void> {
+    const occurrences = await this.occurrenceService.get();
+
+    if (typeof occurrences === 'string')
+      return void this.helperService.showToast(occurrences)
+
+    this.occurrenceList = occurrences;
   }
 
 }

@@ -5,9 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { FeedOccurrenceModule } from '../../../components/feed-occurrence/feed-occurrence.module';
 
-import { ProfilePageRoutingModule } from './profile-routing.module';
-
 import { ProfilePage } from './profile.page';
+import { ProfilePageRoutingModule } from "./profile-routing.module";
 
 @NgModule({
   imports: [
@@ -15,6 +14,7 @@ import { ProfilePage } from './profile.page';
     FormsModule,
     IonicModule,
     FeedOccurrenceModule,
+    ProfilePageRoutingModule,
   ],
   declarations: [ProfilePage]
 })

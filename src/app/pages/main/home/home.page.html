@@ -1,7 +1,7 @@
 <div class="home">
   <img class="home--logo" src="assets/images/logo.svg">
   <div class="home--hello">
-    <p>Oi, <label>{{ user.name }}</label></p>
+    <p>Oi, <label>{{ user?.name || 'Usuário' }}</label></p>
   </div>
   <h3 style="width: 100%; text-align: start;">Selecione o tipo de ocorrência</h3>
   <div class="home--occurrence">
