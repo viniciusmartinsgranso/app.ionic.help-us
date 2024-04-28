@@ -5,14 +5,14 @@ export const apiRoutes = {
   users: {
     create: '/users',
     getMany: '/users',
-    me: '/user/me',
-    update: '/users/{id}',
+    me: '/users/me',
+    update: '/users/one/{id}',
     one: '/users/${id}',
   },
   occurrences: {
-    create: '/occurrence',
-    update: '/occurrence/{id}',
-    one: '/occurrence/{id}',
-    getMany: '/occurrence'
+    create: '/occurrences',
+    update: '/occurrences/{id}',
+    one: '/occurrences/one/{id}',
+    getMany: '/occurrences'
   }
 }

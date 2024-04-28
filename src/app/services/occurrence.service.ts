@@ -1,14 +1,17 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { OccurrenceTypeEnum } from '../models/enums/occurrence-type.enum';
 import { NewOccurrencePayload } from '../models/payloads/new-occurrence.payload';
 import { OccurrenceProxy } from '../models/proxies/occurrence.proxy';
+import { environment } from "../../environments/environment";
+import { HttpAsyncService } from "../modules/http-async/services/http-async.service";
+import { getCrudErrors } from "../utils/functions";
 
 @Injectable({
   providedIn: 'root',
 })
 export class OccurrenceService {
 
-  constructor() { }
+  private readonly http: HttpAsyncService = inject(HttpAsyncService);
 
   public occurrence: NewOccurrencePayload[] = [
     {
@@ -23,22 +26,24 @@ export class OccurrenceService {
 
   public occurrenceList: OccurrenceProxy[] = [];
 
-  public get(): void {
-    // const list = JSON.parse(localStorage.getItem('occurrences'));
-    //
-    // if (!list) {
-    //   localStorage.setItem('occurrences', JSON.stringify(this.occurrenceList));
-    // }
-    // return list;
+  public async get(): Promise<OccurrenceProxy[] | string> {
+    const { error, success } = await this.http.get<OccurrenceProxy[]>(environment.api.routes.occurrences.getMany);
+
+    if (error || !success)
+      return getCrudErrors(error)[0];
+
+    return success;
   }
 
-  public create(occurrence: NewOccurrencePayload): void {
-    // const storageOccurrences = localStorage.getItem('occurrences') ? JSON.parse(localStorage.getItem('occurrences')) : [];
-    //
-    // occurrence.user[0] = JSON.parse(localStorage.getItem('loggedUser'));
-    // storageOccurrences.push(occurrence);
-    // console.log(storageOccurrences);
-    // localStorage.setItem('occurrences', JSON.stringify(storageOccurrences));
+  public async create(occurrence: NewOccurrencePayload): Promise<[boolean, string?]> {
+    const url = environment.api.routes.occurrences.create;
+
+    const { error, success } = await this.http.post<OccurrenceProxy>(url, occurrence);
+
+    if (!success || error)
+      return [false, getCrudErrors(error)[0]]
+
+    return [true];
   }
 
   public update(occurrence: OccurrenceProxy): void {

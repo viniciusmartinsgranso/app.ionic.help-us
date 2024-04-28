@@ -4,17 +4,17 @@
       <div class="profile--modal--content--user">
 
         <div class="profile--modal--content--user--pic">
-          <img [src]="user?.photoUrl || 'assets/images/user.jpg'">
+          <img src="assets/images/user.jpg">
         </div>
 
         <div class="profile--modal--content--user--menu">
-          <img src="assets/images/confirm-exit.svg" (click)="router.navigate(['/logout'])">
+          <img src="assets/images/confirm-exit.svg" (click)="logoutPage('/logout')">
         </div>
 
         <div class="profile--modal--content--user--labels">
-          <label class="profile--modal--content--user--labels--name">{{ user.name }}</label>
+          <label class="profile--modal--content--user--labels--name">{{ user?.name || 'Usuário' }}</label>
           <br>
-          <label class="profile--modal--content--user--labels--job">{{ user.city }}</label>
+          <label class="profile--modal--content--user--labels--job">{{ user?.city || 'Sem cidade' }}</label>
         </div>
 
       </div>

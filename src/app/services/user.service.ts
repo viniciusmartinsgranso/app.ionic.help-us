@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { LoginPayload } from '../models/payloads/login.payload';
-import { CreateUserPayload } from '../models/payloads/register.payload';
+import { CreateUserPayload, RegisterPayload } from '../models/payloads/register.payload';
 import { UserProxy } from '../models/proxies/user.proxy';
 import { environment } from "../../environments/environment";
 import { HttpAsyncService } from "../modules/http-async/services/http-async.service";
@@ -9,6 +9,7 @@ import { getCrudErrors } from "../utils/functions";
 import { JwtTokenProxy } from "../models/proxies/jwt-token.proxy";
 import { BehaviorSubject, Observable } from "rxjs";
 import { StorageService } from "./storage.service";
+import { OccurrenceProxy } from "../models/proxies/occurrence.proxy";
 
 @Injectable({
   providedIn: 'root',
@@ -28,24 +29,35 @@ export class UserService {
       name: '',
       password: '',
       email: '',
+      city: ''
     },
   ];
 
-  public get(): void {
-    // const list = JSON.parse(localStorage.getItem('users'));
-    //
-    // if (!list) {
-    //   localStorage.setItem('users', JSON.stringify(this.user));
-    // }
+  public async get(): Promise<OccurrenceProxy[] | string> {
+    const { error, success } = await this.http.get<OccurrenceProxy[]>(environment.api.routes.occurrences.getMany);
+
+    if (error || !success)
+      return getCrudErrors(error)[0];
+
+    return success;
   }
 
-  public async create(user: CreateUserPayload): Promise<[boolean, string]> {
+  public async create(user: RegisterPayload): Promise<[boolean, string]> {
     const url = environment.api.routes.users.create;
 
-    const { success, error } = await this.http.post<boolean>(url, user);
+    const payload = {
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      city: user.city,
+    }
+
+    const { success, error } = await this.http.post<UserProxy>(url, payload);
 
     if (!success || error)
       return [false, getCrudErrors(error)[0]]
+
+    await this.saveUserInStorage(success);
 
     return [true, 'Usuário criado com sucesso!'];
   }
@@ -150,6 +162,24 @@ export class UserService {
     if (!token) return null;
 
     return token;
+  }
+
+  public async getMeAndSaveInStorage(): Promise<UserProxy> {
+    const { error, success } = await this.http.get<UserProxy>(
+      environment.api.routes.users.me
+    );
+
+    if (error || !success) throw new Error(getCrudErrors(error)[0]);
+
+    await this.saveUserInStorage(success);
+
+    this.setCurrentUser(success);
+
+    return success!;
+  }
+
+  private async saveUserInStorage(user: UserProxy): Promise<void> {
+    await this.storage.setItem<UserProxy>(environment.keys.user, user);
   }
 
 }
