@@ -1,9 +1,9 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { OccurrenceTypeEnum, occurrenceTypeTranslate } from '../../../models/enums/occurrence-type.enum';
-import { UserProxy } from '../../../models/proxies/user.proxy';
 import { UserService } from "../../../services/user.service";
 import { HelperService } from "../../../services/helper";
+import { OccurrenceTypeEnum, occurrenceTypeTranslate } from "../../../models/enums/occurrence-type.enum";
+import { UserProxy } from "../../../models/proxies/user.proxy";
 
 @Component({
   selector: 'app-home',

@@ -7,6 +7,7 @@ import { apiRoutes } from "./apiRoutes";
 export const environment = {
   production: false,
   api: {
+    // apiBaseUrl: 'https://api-nestjs-help-us.onrender.com',
     apiBaseUrl: 'http://localhost:3000',
     routes: apiRoutes
   },
@@ -14,6 +15,7 @@ export const environment = {
     token: '@help-us/token',
     user: '@help-us/user',
   },
+  googleApiKey: 'AIzaSyAMHKh4Wrw5K4PDo7-HT89UIB1_0sOZ5PI',
 };
 
 /*

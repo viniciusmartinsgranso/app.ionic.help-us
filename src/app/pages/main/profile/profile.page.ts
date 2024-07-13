@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { OccurrenceProxy } from '../../../models/proxies/occurrence.proxy';
-import { UserProxy } from '../../../models/proxies/user.proxy';
 import { UserService } from "../../../services/user.service";
 import { HelperService } from "../../../services/helper";
+import { UserProxy } from "../../../models/proxies/user.proxy";
+import { OccurrenceProxy } from "../../../models/proxies/occurrence.proxy";
 
 @Component({
   selector: 'app-profile',

@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { OccurrenceTypeEnum } from '../models/enums/occurrence-type.enum';
 import { NewOccurrencePayload } from '../models/payloads/new-occurrence.payload';
 import { OccurrenceProxy } from '../models/proxies/occurrence.proxy';
 import { environment } from "../../environments/environment";
 import { HttpAsyncService } from "../modules/http-async/services/http-async.service";
 import { getCrudErrors } from "../utils/functions";
+import { createCrudUrl } from "../utils/crud";
 
 @Injectable({
   providedIn: 'root',
@@ -13,21 +13,14 @@ export class OccurrenceService {
 
   private readonly http: HttpAsyncService = inject(HttpAsyncService);
 
-  public occurrence: NewOccurrencePayload[] = [
-    {
-      id: 0,
-      title: 'Ananindeua',
-      location: 'Sorocaba',
-      description: 'aaaaaaaaaa',
-      type: OccurrenceTypeEnum.COOP,
-      photoUrl: 'assets/images/vini.jpg'
-    },
-  ];
-
-  public occurrenceList: OccurrenceProxy[] = [];
-
   public async get(): Promise<OccurrenceProxy[] | string> {
-    const { error, success } = await this.http.get<OccurrenceProxy[]>(environment.api.routes.occurrences.getMany);
+    const url = createCrudUrl<OccurrenceProxy>(environment.api.routes.occurrences.getMany, {
+      search: {
+        isActive: true
+      },
+    });
+
+    const { error, success } = await this.http.get<OccurrenceProxy[]>(url);
 
     if (error || !success)
       return getCrudErrors(error)[0];

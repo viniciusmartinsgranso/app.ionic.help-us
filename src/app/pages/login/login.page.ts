@@ -1,13 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoginPayload } from '../../models/payloads/login.payload';
-import { RegisterPayload } from '../../models/payloads/register.payload';
-import { HelperService } from '../../services/helper';
-import { UserService } from '../../services/user.service';
-import { CustomValidators } from '../../utils/validators';
+import { HelperService } from "../../services/helper";
+import { AuthService } from "../../services/auth.service";
+import { LoginPayload } from "../../models/payloads/login.payload";
+import { CustomValidators } from "../../utils/validators";
 import isValidEmail = CustomValidators.isValidEmail;
 import isValidPassword = CustomValidators.isValidPassword;
-import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: 'app-login',

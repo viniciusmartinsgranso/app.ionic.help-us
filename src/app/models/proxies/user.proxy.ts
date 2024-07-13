@@ -1,9 +1,11 @@
-export interface UserProxy {
-  id: number;
+import { BaseProxy } from "./base.proxy";
+
+export interface UserProxy extends BaseProxy {
   name: string;
   email: string;
   city: string;
   photoUrl?: string;
-  createdAt?: string;
-  updatedAt?: string;
 }
+
+export type UserWithPassword = Partial<UserProxy> & { password: string };
+

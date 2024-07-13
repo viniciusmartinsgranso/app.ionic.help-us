@@ -9,10 +9,18 @@ import { AppRoutingModule } from './app-routing.module';
 import { NavbarComponent } from "../components/navbar/navbar.component";
 import { HttpAsyncModule } from "../modules/http-async/http-async.module";
 import { HttpClientModule } from "@angular/common/http";
+import { GoogleMapsModule } from "@angular/google-maps";
 
 @NgModule({
   declarations: [AppComponent, NavbarComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpAsyncModule, HttpClientModule],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    HttpAsyncModule,
+    HttpClientModule,
+    GoogleMapsModule,
+  ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
