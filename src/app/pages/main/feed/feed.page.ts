@@ -1,7 +1,16 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { OccurrenceProxy } from '../../../models/proxies/occurrence.proxy';
-import { OccurrenceService } from '../../../services/occurrence.service';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import * as L from 'leaflet';
+import { OccurrenceService } from "../../../services/occurrence.service";
 import { HelperService } from "../../../services/helper";
+import { LocationInterface } from "../../../models/interfaces/location.interface";
+import { OccurrenceProxy } from "../../../models/proxies/occurrence.proxy";
+import { ActionSheetController, IonModal } from "@ionic/angular";
+import {
+  OccurrenceTypeEnum,
+  occurrenceTypeIconRecord,
+  occurrenceTypeTranslate, occurrenceTypeWhiteImage
+} from "../../../models/enums/occurrence-type.enum";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 
 @Component({
   selector: 'app-feed',
@@ -10,23 +19,202 @@ import { HelperService } from "../../../services/helper";
 })
 export class FeedPage implements OnInit {
 
+  constructor() {
+    navigator.geolocation.getCurrentPosition((e) => this.setGeolocation(e.coords),
+      async () => await this.helperService.showAlert('Atenção, você não aceitou a localização.', ['Ok']),
+      { timeout: 40000 });
+
+    this.formGroup = this.formBuilder.nonNullable.group({
+      title: ['', [Validators.required, Validators.minLength(4)]],
+      description: ['', [Validators.required, Validators.minLength(4)]],
+      location: ['', [Validators.required, Validators.minLength(4)]],
+      latitude: [0],
+      longitude: [0],
+      type: [null, Validators.required],
+      photoUrl: [null]
+    });
+  }
+
+  //#region Injection Services
+
   private readonly occurrenceService: OccurrenceService = inject(OccurrenceService);
 
   private readonly helperService: HelperService = inject(HelperService);
 
+  private readonly actionSheetCtrl: ActionSheetController = inject(ActionSheetController);
+
+  private readonly formBuilder: FormBuilder = inject(FormBuilder);
+
+  //#endregion
+
+  //#region Public Properties
+
+  @ViewChild('modal') modal?: IonModal;
+
+  public map!: L.Map;
+
+  public currentLocation: LocationInterface = {
+    latitude: 0,
+    longitude: 0,
+  };
+
+  public currentIcon = L.icon({
+    iconUrl: 'assets/images/current-location.png',
+    iconSize: [38, 40],
+    shadowSize: [50, 9],
+    iconAnchor: [22, 39],
+    shadowAnchor: [4, 7],
+    popupAnchor: [-3, -131]
+  });
+
+  public occurrences: OccurrenceProxy[] = [];
+
+  public isOpenCreateModal: boolean = false;
+
+  public isOpenOccurrenceModal: boolean = false;
+
+  public presentingElement: any;
+
+  public formGroup: FormGroup;
+
+  public occurrenceType: typeof OccurrenceTypeEnum = OccurrenceTypeEnum;
+
+  public translatedOccurrenceType: Record<OccurrenceTypeEnum, string> = occurrenceTypeTranslate;
+
+  public occurrenceWhiteIcon: Record<OccurrenceTypeEnum, string> = occurrenceTypeWhiteImage;
+
+  // public geocoder: google.maps.Geocoder = new google.maps.Geocoder();
+
+  //#endregion
+
+  //#Region Public Methods
+
   public async ngOnInit(): Promise<void> {
-    await this.getOccurrences();
+    this.presentingElement = document.querySelector('.feed');
   }
 
-  public occurrenceList: OccurrenceProxy[] = [];
+  public async ionViewDidEnter(): Promise<void> {
+    await this.getOccurrences();
+    this.initMap();
+
+    const marker = L.marker([this.currentLocation.latitude, this.currentLocation.longitude], { icon: this.currentIcon }).addTo(this.map);
+
+    this.occurrences.forEach((occurrence) => {
+      const icon = L.icon({
+        iconUrl: occurrenceTypeIconRecord[occurrence.type],
+        iconSize: [38, 40],
+        shadowSize: [50, 9],
+        iconAnchor: [22, 39],
+        shadowAnchor: [4, 7],
+        popupAnchor: [-3, -131],
+        className: 'leaftlet-occurrence-icon',
+      });
+
+      const marker = L.marker([occurrence.latitude, occurrence.longitude], { icon }).addTo(this.map);
+      marker.addEventListener('click', async () => {
+        this.isOpenOccurrenceModal = true
+      });
+    })
+
+    marker.addEventListener('click', e => console.log('Localização atual'))
+
+    this.map.addEventListener('click', (e) => {
+      this.isOpenCreateModal = true;
+      this.formGroup.controls['latitude'].setValue(e.latlng.lat);
+      this.formGroup.controls['longitude'].setValue(e.latlng.lng);
+    });
+  }
 
   public async getOccurrences(): Promise<void> {
     const occurrences = await this.occurrenceService.get();
 
-    if (typeof occurrences === 'string')
+    if (typeof occurrences === "string")
       return void this.helperService.showToast(occurrences)
 
-    this.occurrenceList = occurrences;
+    this.occurrences = occurrences;
   }
 
+  public closeModal(): void {
+    this.canDismiss();
+  }
+
+  public async canDismiss(): Promise<void> {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Deseja mesmo sair?',
+      buttons: [
+        {
+          text: 'Sim',
+          role: 'confirm',
+        },
+        {
+          text: 'Não',
+          role: 'cancel',
+        },
+      ],
+    });
+
+    await actionSheet.present();
+
+    const { role } = await actionSheet.onWillDismiss();
+
+    this.isOpenCreateModal = role !== 'confirm';
+
+    if (!this.isOpenCreateModal)
+      this.formGroup.reset();
+  }
+
+  public getCurrentIconType(): string {
+    return this.occurrenceWhiteIcon[this.formGroup.controls['type'].value as OccurrenceTypeEnum];
+  }
+
+  public async postOccurrence(): Promise<void> {
+    const payload = this.formGroup.getRawValue();
+    const [canCreate, message] = await this.occurrenceService.create(payload);
+
+    if (!canCreate && message)
+      return void await this.helperService.showToast(message);
+
+    await this.helperService.showToast('Ocorrência criada com sucesso!');
+    this.isOpenCreateModal = false;
+
+    await this.getOccurrences();
+  }
+
+  //#endregion
+
+  //#Region Private Methods
+
+  private initMap(): void {
+    this.map = L.map('map', {
+      zoom: 3,
+      tap: true,
+    }).setView([this.currentLocation.latitude, this.currentLocation.longitude], 15);
+
+    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        maxZoom: 18,
+        minZoom: 3,
+      },
+    );
+    tiles.addTo(this.map);
+  }
+
+  private setGeolocation(geo: GeolocationCoordinates): void {
+    this.currentLocation.longitude = geo.longitude;
+    this.currentLocation.latitude = geo.latitude;
+  }
+
+  // public async geocodeAddress(address: string): Promise<void> {
+  //   await this.geocoder.geocode({ address }, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
+  //     if (status === 'OK' && results) {
+  //       const location = results[0].geometry.location;
+  //       this.currentLocation.latitude = location.lat();
+  //       this.currentLocation.longitude = location.lng();
+  //       console.log('Latitude:', this.currentLocation.latitude);
+  //       console.log('Longitude:', this.currentLocation.longitude);
+  //     } else {
+  //       console.error('Geocode falhou devido a:', status);
+  //     }
+  //   });
+  // }
 }

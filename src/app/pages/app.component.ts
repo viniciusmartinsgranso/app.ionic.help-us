@@ -29,7 +29,7 @@ export class AppComponent {
 
   public canShowNavbar: boolean = false;
 
-  public routesWithoutNavbar: string[] = ['/login', '/new-feed-occurrence', '/register', '/logout'];
+  public routesWithoutNavbar: string[] = ['/login', '/register', '/logout'];
 
   public routeSubscription: Subscription = new Subscription();
 

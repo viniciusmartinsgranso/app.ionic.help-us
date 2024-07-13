@@ -4,11 +4,11 @@
       <div class="profile--modal--content--user">
 
         <div class="profile--modal--content--user--pic">
-          <img src="assets/images/user.jpg">
+          <img src="../../../../../assets/images/user.jpg">
         </div>
 
         <div class="profile--modal--content--user--menu">
-          <img src="assets/images/confirm-exit.svg" (click)="logoutPage('/logout')">
+          <img src="../../../../../assets/images/confirm-exit.svg" (click)="logoutPage('/logout')">
         </div>
 
         <div class="profile--modal--content--user--labels">
@@ -27,9 +27,9 @@
         <ng-template *ngIf="occurrences" [ngTemplateOutlet]="posts"></ng-template>
         <ng-template *ngIf="!occurrences" [ngTemplateOutlet]="empty"></ng-template>
         <ng-template #posts>
-          <div class="profile--modal--content--posts--my-posts">
-            <app-feed-occurrence *ngFor="let posts of occurrences" [occurrence]="posts"></app-feed-occurrence>
-          </div>
+<!--          <div class="profile&#45;&#45;modal&#45;&#45;content&#45;&#45;posts&#45;&#45;my-posts">-->
+<!--            <app-feed-occurrence *ngFor="let posts of occurrences" [occurrence]="posts"></app-feed-occurrence>-->
+<!--          </div>-->
         </ng-template>
         <ng-template #empty>
           <div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 
@@ -7,14 +7,12 @@ import { ModalController } from '@ionic/angular';
   templateUrl: './finish-occurrence.component.html',
   styleUrls: ['./finish-occurrence.component.scss'],
 })
-export class FinishOccurrenceComponent implements OnInit {
+export class FinishOccurrenceComponent  {
 
   constructor(
     private readonly modalController: ModalController,
     private readonly router: Router,
   ) { }
-
-  ngOnInit() {}
 
   public async onClickExit(): Promise<void> {
     await this.modalController.dismiss();

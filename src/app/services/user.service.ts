@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { LoginPayload } from '../models/payloads/login.payload';
-import { CreateUserPayload, RegisterPayload } from '../models/payloads/register.payload';
-import { UserProxy } from '../models/proxies/user.proxy';
+import { RegisterPayload } from '../models/payloads/register.payload';
+import { UserProxy, UserWithPassword } from '../models/proxies/user.proxy';
 import { environment } from "../../environments/environment";
 import { HttpAsyncService } from "../modules/http-async/services/http-async.service";
 import { HelperService } from "./helper";
@@ -24,15 +24,6 @@ export class UserService {
 
   private readonly storage: StorageService = inject(StorageService);
 
-  public user: CreateUserPayload[] = [
-    {
-      name: '',
-      password: '',
-      email: '',
-      city: ''
-    },
-  ];
-
   public async get(): Promise<OccurrenceProxy[] | string> {
     const { error, success } = await this.http.get<OccurrenceProxy[]>(environment.api.routes.occurrences.getMany);
 
@@ -42,7 +33,7 @@ export class UserService {
     return success;
   }
 
-  public async create(user: RegisterPayload): Promise<[boolean, string]> {
+  public async create(user: UserWithPassword): Promise<[boolean, string]> {
     const url = environment.api.routes.users.create;
 
     const payload = {
@@ -101,7 +92,7 @@ export class UserService {
     // }
   }
 
-  public invitedLogin(user: CreateUserPayload): void {
+  public invitedLogin(user: any): void {
     // localStorage.removeItem('loggedUser');
     // const storageUsers = localStorage.getItem('users') ? JSON.parse(localStorage.getItem('users')) : [];
     // console.log(storageUsers);

@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
-import { FeedOccurrenceModule } from '../../../components/feed-occurrence/feed-occurrence.module';
 
 import { ProfilePage } from './profile.page';
 import { ProfilePageRoutingModule } from "./profile-routing.module";
+import { FeedOccurrenceModule } from "../../../components/feed-occurrence/feed-occurrence.module";
 
 @NgModule({
   imports: [
