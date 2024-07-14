@@ -5,6 +5,7 @@ import { environment } from "../../environments/environment";
 import { HttpAsyncService } from "../modules/http-async/services/http-async.service";
 import { getCrudErrors } from "../utils/functions";
 import { createCrudUrl } from "../utils/crud";
+import { LocationInterface } from "../models/interfaces/location.interface";
 
 @Injectable({
   providedIn: 'root',
@@ -13,10 +14,14 @@ export class OccurrenceService {
 
   private readonly http: HttpAsyncService = inject(HttpAsyncService);
 
-  public async get(): Promise<OccurrenceProxy[] | string> {
+  public async get(location: LocationInterface): Promise<OccurrenceProxy[] | string> {
     const url = createCrudUrl<OccurrenceProxy>(environment.api.routes.occurrences.getMany, {
       search: {
-        isActive: true
+        isActive: true,
+      },
+      customParams: {
+        latitude: location.latitude,
+        longitude: location.longitude,
       },
     });
 
