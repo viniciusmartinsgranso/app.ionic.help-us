@@ -33,6 +33,11 @@ export interface CrudRequestParams<T> {
    */
   sort?: { field: CrudRequestField<T>; order: 'ASC' | 'DESC' }[];
 
+  /**
+   * Parametros personalizados
+   */
+  customParams?: { [key: string]: string | number | boolean };
+
 }
 
 /**
@@ -221,6 +226,12 @@ export function createCrudParams<T>(params: CrudRequestParams<T>): string {
 
   if (params.sort)
     params.sort.forEach((s, i) => qs.push(`sort[${ i }]=${ encodeURIComponent(s.field + ',' + s.order) }`));
+
+  if (params.customParams) {
+    Object.keys(params.customParams).forEach(key => {
+      qs.push(`${key}=${encodeURIComponent(params.customParams![key])}`);
+    });
+  }
 
   return qs.join('&');
 }

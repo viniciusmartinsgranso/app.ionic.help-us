@@ -126,7 +126,7 @@ export class FeedPage implements OnInit {
   }
 
   public async getOccurrences(): Promise<void> {
-    const occurrences = await this.occurrenceService.get();
+    const occurrences = await this.occurrenceService.get(this.currentLocation);
 
     if (typeof occurrences === "string")
       return void this.helperService.showToast(occurrences)
