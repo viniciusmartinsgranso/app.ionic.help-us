@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from "@angular/router";
 import { filter } from "rxjs/operators";
 import { Subscription } from "rxjs";
@@ -8,7 +8,7 @@ import { Subscription } from "rxjs";
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
 
   private readonly router: Router = inject(Router);
 

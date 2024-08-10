@@ -7,7 +7,6 @@ import { IonicModule } from '@ionic/angular';
 import { FeedPageRoutingModule } from './feed-routing.module';
 
 import { FeedPage } from './feed.page';
-import { FeedOccurrenceModule } from "../../../components/feed-occurrence/feed-occurrence.module";
 
 @NgModule({
   imports: [
@@ -15,7 +14,6 @@ import { FeedOccurrenceModule } from "../../../components/feed-occurrence/feed-o
     FormsModule,
     IonicModule,
     FeedPageRoutingModule,
-    FeedOccurrenceModule,
     ReactiveFormsModule,
   ],
   declarations: [FeedPage],

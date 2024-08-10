@@ -8,16 +8,8 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'home',
-    loadChildren: () => import('./main/home/home.module').then(m => m.HomePageModule)
-  },
-  {
     path: 'login',
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
-  },
-  {
-    path: 'profile',
-    loadChildren: () => import('./main/profile/profile.module').then( m => m.ProfilePageModule)
   },
   {
     path: 'feed',
@@ -32,10 +24,15 @@ const routes: Routes = [
     loadChildren: () => import('./main/logout/logout.module').then( m => m.LogoutPageModule)
   },
   {
+    path: 'profile',
+    loadChildren: () => import('./main/profile/profile.module').then( m => m.ProfilePageModule)
+  },
+  {
     path: '**',
     redirectTo: 'login',
     pathMatch: 'full'
   },
+
 ];
 
 @NgModule({

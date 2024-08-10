@@ -15,14 +15,10 @@ export class NavbarComponent   {
   constructor(
     private readonly router: Router,
   ) {
-    router.events
+    this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((route) => {
         const routerEvent = route as NavigationEnd;
-
-        if (routerEvent.url.includes('/home'))
-          this.currentNavbar = NavbarEnum.HOME;
-
         if (routerEvent.url.includes('/feed'))
           this.currentNavbar = NavbarEnum.FEED;
 
@@ -33,15 +29,9 @@ export class NavbarComponent   {
 
   public navbarEnum: typeof NavbarEnum = NavbarEnum;
 
-  public currentNavbar: NavbarEnum = NavbarEnum.HOME;
+  public currentNavbar: NavbarEnum = NavbarEnum.FEED;
 
   public navbarList: NavbarItemInterface[] = [
-    {
-      type: NavbarEnum.HOME,
-      link: '/home',
-      icon: 'assets/images/navbar-home.svg',
-      iconActivated: 'assets/images/navbar-home-selected.svg',
-    },
     {
       type: NavbarEnum.FEED,
       link: '/feed',

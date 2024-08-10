@@ -4,10 +4,10 @@
   --height: 65vh;
 }
 
-.background-profile-modal {
+.background-filter-modal {
   --background: transparent;
   //{@link https://forum.ionicframework.com/t/cannot-dismiss-a-modal-by-clicking-the-backdrop-ionic-6/221459}
-  --height: 100vh;
+  --height: 60vh;
   backdrop-filter: blur(0.1rem);
 }
 
@@ -15,4 +15,10 @@
   background: #dedede;
   border: 0.1rem solid black;
   border-radius: 100%;
+}
+
+.all-center {
+  display: flex;
+  align-content: center;
+  justify-content: center;
 }

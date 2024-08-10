@@ -4,18 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
+import { ProfilePageRoutingModule } from './profile-routing.module';
+
 import { ProfilePage } from './profile.page';
-import { ProfilePageRoutingModule } from "./profile-routing.module";
-import { FeedOccurrenceModule } from "../../../components/feed-occurrence/feed-occurrence.module";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    FeedOccurrenceModule,
-    ProfilePageRoutingModule,
+    ProfilePageRoutingModule
   ],
-  declarations: [ProfilePage]
+  declarations: [ProfilePage],
 })
 export class ProfilePageModule {}

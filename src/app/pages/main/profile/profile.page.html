@@ -1,43 +1,23 @@
-<div class="profile">
-  <div class="profile--modal">
-    <div class="profile--modal--content">
-      <div class="profile--modal--content--user">
+<ion-content [fullscreen]="true">
+  <div class="profile">
+    <ion-grid>
+      <ion-row>
+        <ion-col></ion-col>
+        <ion-col>
+          <img class="profile--user-image" src="assets/images/user.jpg" alt="Imagem">
+        </ion-col>
+        <ion-col>
+          <a class="profile--exit">
+            <img src="assets/images/confirm-exit.svg" alt="">
+          </a>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
-        <div class="profile--modal--content--user--pic">
-          <img src="../../../../../assets/images/user.jpg">
-        </div>
+    <div>
+      <h3>As suas ocorrências</h3>
 
-        <div class="profile--modal--content--user--menu">
-          <img src="../../../../../assets/images/confirm-exit.svg" (click)="logoutPage('/logout')">
-        </div>
-
-        <div class="profile--modal--content--user--labels">
-          <label class="profile--modal--content--user--labels--name">{{ user?.name || 'Usuário' }}</label>
-          <br>
-          <label class="profile--modal--content--user--labels--job">{{ user?.city || 'Sem cidade' }}</label>
-        </div>
-
-      </div>
-
-      <div class="profile--modal--content--posts">
-        <div class="profile--modal--content--posts--title">
-          <h4 style="font-weight: bold;">MINHAS OCORRENCIAS</h4>
-        </div>
-
-        <ng-template *ngIf="occurrences" [ngTemplateOutlet]="posts"></ng-template>
-        <ng-template *ngIf="!occurrences" [ngTemplateOutlet]="empty"></ng-template>
-        <ng-template #posts>
-<!--          <div class="profile&#45;&#45;modal&#45;&#45;content&#45;&#45;posts&#45;&#45;my-posts">-->
-<!--            <app-feed-occurrence *ngFor="let posts of occurrences" [occurrence]="posts"></app-feed-occurrence>-->
-<!--          </div>-->
-        </ng-template>
-        <ng-template #empty>
-          <div>
-            <h3 style="color: grey">Você ainda não possui ocorrência :(</h3>
-          </div>
-        </ng-template>
-
-      </div>
+      <div id="map"></div>
     </div>
   </div>
-</div>
+</ion-content>

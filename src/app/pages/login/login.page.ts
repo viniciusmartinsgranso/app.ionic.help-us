@@ -48,7 +48,7 @@ export class LoginPage {
       return void this.helperService.showToast(message);
 
     await this.helperService.showToast('Sucesso!', );
-    await this.router.navigateByUrl('/home');
+    await this.router.navigateByUrl('/feed');
   }
 
   public canLogin(): boolean {
@@ -56,17 +56,17 @@ export class LoginPage {
   }
 
   public async invitedLogin(): Promise<void> {
-    // const lastItem = JSON.parse(localStorage.getItem('users'));
-    // if (!lastItem) {
-    //   this.invitedUser.id = 0;
-    // }
-    // else {
-    //   this.invitedUser.id = lastItem[lastItem.length - 1].id + 1;
-    // }
-    //
-    // this.userService.invitedLogin(this.invitedUser);
-    // await this.helperService.showToast('Você entrou no modo convidado e suas informações de usuário serão padrões.', 1000);
-    // await this.router.navigate(['/home']);
+    this.isLoading = true;
+
+    const [canLogin, message] = await this.authService.invited();
+
+    this.isLoading = false;
+
+    if (!canLogin)
+      return void this.helperService.showToast(message);
+
+    await this.helperService.showToast(message);
+    await this.router.navigateByUrl('/feed');
   }
 
 }

@@ -4,13 +4,16 @@ import { OccurrenceService } from "../../../services/occurrence.service";
 import { HelperService } from "../../../services/helper";
 import { LocationInterface } from "../../../models/interfaces/location.interface";
 import { OccurrenceProxy } from "../../../models/proxies/occurrence.proxy";
-import { ActionSheetController, IonModal } from "@ionic/angular";
+import { ActionSheetController, IonModal, ModalController } from "@ionic/angular";
 import {
   OccurrenceTypeEnum,
   occurrenceTypeIconRecord,
   occurrenceTypeTranslate, occurrenceTypeWhiteImage
 } from "../../../models/enums/occurrence-type.enum";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { MediaService } from "../../../services/media.service";
+import { UserService } from "../../../services/user.service";
+import { UserProxy } from "../../../models/proxies/user.proxy";
 
 @Component({
   selector: 'app-feed',
@@ -45,11 +48,19 @@ export class FeedPage implements OnInit {
 
   private readonly formBuilder: FormBuilder = inject(FormBuilder);
 
+  private readonly modalController: ModalController = inject(ModalController);
+
+  private readonly mediaService: MediaService = inject(MediaService);
+
+  private readonly userService: UserService = inject(UserService);
+
   //#endregion
 
   //#region Public Properties
 
-  @ViewChild('modal') modal?: IonModal;
+  @ViewChild('createModal') createModal?: IonModal;
+
+  @ViewChild('infoModal') infoModal?: IonModal;
 
   public map!: L.Map;
 
@@ -69,9 +80,9 @@ export class FeedPage implements OnInit {
 
   public occurrences: OccurrenceProxy[] = [];
 
-  public isOpenCreateModal: boolean = false;
+  public isOpenCreateAndEditModal: boolean = false;
 
-  public isOpenOccurrenceModal: boolean = false;
+  public isOpenInfoModal: boolean = false;
 
   public presentingElement: any;
 
@@ -83,6 +94,14 @@ export class FeedPage implements OnInit {
 
   public occurrenceWhiteIcon: Record<OccurrenceTypeEnum, string> = occurrenceTypeWhiteImage;
 
+  public occurrence!: OccurrenceProxy;
+
+  public currentUser!: UserProxy;
+
+  public canEdit: boolean = false;
+
+  public isEdit: boolean = false;
+
   // public geocoder: google.maps.Geocoder = new google.maps.Geocoder();
 
   //#endregion
@@ -91,54 +110,23 @@ export class FeedPage implements OnInit {
 
   public async ngOnInit(): Promise<void> {
     this.presentingElement = document.querySelector('.feed');
+    await this.getOccurrences();
+    const user = await this.userService.getCurrentUserFromStorage();
+
+    if (user)
+      this.currentUser = user;
   }
 
   public async ionViewDidEnter(): Promise<void> {
     await this.getOccurrences();
     this.initMap();
-
-    const marker = L.marker([this.currentLocation.latitude, this.currentLocation.longitude], { icon: this.currentIcon }).addTo(this.map);
-
-    this.occurrences.forEach((occurrence) => {
-      const icon = L.icon({
-        iconUrl: occurrenceTypeIconRecord[occurrence.type],
-        iconSize: [38, 40],
-        shadowSize: [50, 9],
-        iconAnchor: [22, 39],
-        shadowAnchor: [4, 7],
-        popupAnchor: [-3, -131],
-        className: 'leaftlet-occurrence-icon',
-      });
-
-      const marker = L.marker([occurrence.latitude, occurrence.longitude], { icon }).addTo(this.map);
-      marker.addEventListener('click', async () => {
-        this.isOpenOccurrenceModal = true
-      });
-    })
-
-    marker.addEventListener('click', e => console.log('Localização atual'))
-
-    this.map.addEventListener('click', (e) => {
-      this.isOpenCreateModal = true;
-      this.formGroup.controls['latitude'].setValue(e.latlng.lat);
-      this.formGroup.controls['longitude'].setValue(e.latlng.lng);
-    });
   }
 
-  public async getOccurrences(): Promise<void> {
-    const occurrences = await this.occurrenceService.get(this.currentLocation);
-
-    if (typeof occurrences === "string")
-      return void this.helperService.showToast(occurrences)
-
-    this.occurrences = occurrences;
+  public async closeInfoModal(): Promise<void> {
+    this.isOpenInfoModal = false;
   }
 
-  public closeModal(): void {
-    this.canDismiss();
-  }
-
-  public async canDismiss(): Promise<void> {
+  public async closeCreateModal(): Promise<void> {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Deseja mesmo sair?',
       buttons: [
@@ -157,9 +145,9 @@ export class FeedPage implements OnInit {
 
     const { role } = await actionSheet.onWillDismiss();
 
-    this.isOpenCreateModal = role !== 'confirm';
+    this.isOpenCreateAndEditModal = role !== 'confirm';
 
-    if (!this.isOpenCreateModal)
+    if (!this.isOpenCreateAndEditModal)
       this.formGroup.reset();
   }
 
@@ -175,14 +163,68 @@ export class FeedPage implements OnInit {
       return void await this.helperService.showToast(message);
 
     await this.helperService.showToast('Ocorrência criada com sucesso!');
-    this.isOpenCreateModal = false;
+    this.isOpenCreateAndEditModal = false;
 
     await this.getOccurrences();
+    this.setPropertiesToMap();
+  }
+
+  public async uploadImage(event: Event): Promise<void> {
+    if (!event.target) return;
+
+    const fileList = (event.target as HTMLInputElement).files;
+    if (!fileList || fileList.length === 0) return;
+
+    const file = fileList[0] as File;
+    if (!file) return;
+
+    const [success, media] = await this.mediaService.uploadImage(file);
+    if (!success)
+      return await this.helperService.showToast(media);
+
+    this.formGroup.controls['photoUrl'].setValue(media);
+  }
+
+  public editOccurrence(): void {
+    if (!this.canEdit || !this.isEdit)
+      return;
+
+    this.formGroup.reset();
+    this.isEdit = true;
+
+    this.formGroup.patchValue({
+      title: this.occurrence.title,
+      description: this.occurrence.description,
+      location: this.occurrence.location,
+      type: this.occurrence.type,
+      photoUrl: this.occurrence.photoUrl
+    });
+
+    this.isOpenInfoModal = false;
+    this.isOpenCreateAndEditModal = true;
+  }
+
+  public updateOccurrence(): void {
+    console.log(this.formGroup.getRawValue())
+  }
+
+  public async canDismiss(data?: any, role?: string) {
+    return role !== 'gesture';
   }
 
   //#endregion
 
   //#Region Private Methods
+
+  private async getOccurrences(): Promise<void> {
+    this.occurrences = [];
+    const occurrences = await this.occurrenceService.get(this.currentLocation);
+
+    if (typeof occurrences === "string")
+      return void this.helperService.showToast(occurrences)
+
+    this.occurrences = occurrences;
+  }
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -197,11 +239,53 @@ export class FeedPage implements OnInit {
       },
     );
     tiles.addTo(this.map);
+
+    this.setPropertiesToMap();
   }
 
   private setGeolocation(geo: GeolocationCoordinates): void {
     this.currentLocation.longitude = geo.longitude;
     this.currentLocation.latitude = geo.latitude;
+  }
+
+  private setPropertiesToMap(): void {
+    const marker = L.marker([this.currentLocation.latitude, this.currentLocation.longitude], { icon: this.currentIcon }).addTo(this.map);
+
+    this.occurrences.forEach((occurrence) => {
+      const icon = L.icon({
+        iconUrl: occurrenceTypeIconRecord[occurrence.type],
+        iconSize: [38, 40],
+        shadowSize: [50, 9],
+        iconAnchor: [22, 39],
+        shadowAnchor: [4, 7],
+        popupAnchor: [-3, -131],
+        className: 'leaftlet-occurrence-icon',
+      });
+
+      const marker = L.marker([occurrence.latitude, occurrence.longitude], { icon }).addTo(this.map);
+      marker.addEventListener('click', async () => {
+        const [response, message] = await this.userService.getOne(occurrence.userId);
+
+        if (occurrence.userId === this.currentUser.id)
+          this.canEdit = true;
+
+        if (typeof response === "boolean" && message)
+          return void await this.helperService.showToast('O usuário não existe ou foi desativado.');
+
+        occurrence.user = response as UserProxy;
+
+        this.occurrence = occurrence;
+        this.isOpenInfoModal = true;
+      });
+    })
+
+    marker.addEventListener('click', e => console.log('Localização atual'))
+
+    this.map.addEventListener('click', (e) => {
+      this.isOpenCreateAndEditModal = true;
+      this.formGroup.controls['latitude'].setValue(e.latlng.lat);
+      this.formGroup.controls['longitude'].setValue(e.latlng.lng);
+    });
   }
 
   // public async geocodeAddress(address: string): Promise<void> {

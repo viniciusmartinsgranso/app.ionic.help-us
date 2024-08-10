@@ -56,7 +56,7 @@ export class RegisterPage {
       return void this.helper.showToast('Ocorreu um erro, tente logar novamente na página de login.');
 
     await this.helper.showToast(messageCreate);
-    await this.router.navigate(['/home']);
+    await this.router.navigate(['/feed']);
   }
 
   public canRegister(): boolean {

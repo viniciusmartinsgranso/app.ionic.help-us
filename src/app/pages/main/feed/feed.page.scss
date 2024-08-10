@@ -102,6 +102,47 @@
   }
 }
 
+
+.occurrence-info {
+  padding: 1rem;
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  &--type {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &--user {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    &--about {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: .6rem;
+
+      &--name {
+
+      }
+
+      &--city {
+        color: var(--yellow-color);
+        font-weight: bold;
+      }
+    }
+  }
+
+  &--image {
+    border-radius: 0.5rem;
+    border: 0.1rem dashed var(--yellow-color);
+  }
+}
+
 .description-image {
   position: absolute;
   left: 0.6rem;

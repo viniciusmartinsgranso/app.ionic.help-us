@@ -10,6 +10,7 @@ import { JwtTokenProxy } from "../models/proxies/jwt-token.proxy";
 import { BehaviorSubject, Observable } from "rxjs";
 import { StorageService } from "./storage.service";
 import { OccurrenceProxy } from "../models/proxies/occurrence.proxy";
+import { createCrudUrl } from "../utils/crud";
 
 @Injectable({
   providedIn: 'root',
@@ -24,8 +25,8 @@ export class UserService {
 
   private readonly storage: StorageService = inject(StorageService);
 
-  public async get(): Promise<OccurrenceProxy[] | string> {
-    const { error, success } = await this.http.get<OccurrenceProxy[]>(environment.api.routes.occurrences.getMany);
+  public async get(): Promise<UserProxy[] | string> {
+    const { error, success } = await this.http.get<UserProxy[]>(environment.api.routes.users.getMany);
 
     if (error || !success)
       return getCrudErrors(error)[0];
@@ -51,6 +52,21 @@ export class UserService {
     await this.saveUserInStorage(success);
 
     return [true, 'Usuário criado com sucesso!'];
+  }
+
+  public async getOne(id: number): Promise<[UserProxy | boolean, string?]> {
+    const url = createCrudUrl<UserProxy>(environment.api.routes.users.one.replace('{id}', String(id)), {
+      search: {
+        isActive: true
+      }
+    });
+
+    const { success, error } = await this.http.get<UserProxy>(url);
+
+    if (!success || error)
+      return [false, getCrudErrors(error)[0]]
+
+    return [success];
   }
 
   public update(user: UserProxy): void {

@@ -1,7 +1,7 @@
 {
   "name": "help-us-front",
   "version": "0.0.1",
-  "author": "Ionic Framework",
+  "author": "Vinícius Martins Granso",
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
@@ -28,7 +28,7 @@
     "@capacitor/core": "^6.0.0",
     "@capacitor/geolocation": "^6.0.0",
     "@capacitor/haptics": "6.0.0",
-    "@capacitor/ios": "^6.1.0",
+    "@capacitor/ios": "^6.1.1",
     "@capacitor/keyboard": "6.0.0",
     "@capacitor/status-bar": "6.0.0",
     "@ionic/angular": "^8.0.0",
