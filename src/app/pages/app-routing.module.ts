@@ -1,5 +1,23 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { AuthenticateGuard } from "../guards/authentication.guards";
+import { environment } from "../../environments/environment";
+
+export const unAuthenticatedRoute = {
+  canActivate: [AuthenticateGuard],
+  data: {
+    routeToRedirect: environment.config.redirectToWhenAuthenticated,
+    unprotectedRoute: true,
+  },
+};
+
+export const authenticatedRoute = {
+  canActivate: [AuthenticateGuard],
+  data: {
+    routeToRedirect: environment.config.redirectToWhenUnauthenticated,
+    protectedRoute: true,
+  },
+};
 
 const routes: Routes = [
   {
@@ -9,23 +27,27 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
+    loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule),
+    ...unAuthenticatedRoute
   },
   {
     path: 'feed',
-    loadChildren: () => import('./main/feed/feed.module').then( m => m.FeedPageModule)
+    loadChildren: () => import('./main/feed/feed.module').then(m => m.FeedPageModule),
+    ...authenticatedRoute
   },
   {
     path: 'register',
-    loadChildren: () => import('./register/register.module').then( m => m.RegisterPageModule)
+    loadChildren: () => import('./register/register.module').then(m => m.RegisterPageModule),
+    ...unAuthenticatedRoute
   },
   {
     path: 'logout',
-    loadChildren: () => import('./main/logout/logout.module').then( m => m.LogoutPageModule)
+    loadChildren: () => import('./main/logout/logout.module').then(m => m.LogoutPageModule)
   },
   {
     path: 'profile',
-    loadChildren: () => import('./main/profile/profile.module').then( m => m.ProfilePageModule)
+    loadChildren: () => import('./main/profile/profile.module').then(m => m.ProfilePageModule),
+    ...authenticatedRoute,
   },
   {
     path: '**',
@@ -41,4 +63,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -10,5 +10,8 @@ export const environment = {
     token: '@help-us/token',
     user: '@help-us/user',
   },
-  googleApiKey: 'AIzaSyAMHKh4Wrw5K4PDo7-HT89UIB1_0sOZ5PI',
+  config: {
+    redirectToWhenAuthenticated: '/feed',
+    redirectToWhenUnauthenticated: '/login',
+  },
 };
