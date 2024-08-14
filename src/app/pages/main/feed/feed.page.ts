@@ -1,10 +1,10 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { OccurrenceService } from "../../../services/occurrence.service";
 import { HelperService } from "../../../services/helper";
 import { LocationInterface } from "../../../models/interfaces/location.interface";
 import { OccurrenceProxy } from "../../../models/proxies/occurrence.proxy";
-import { ActionSheetController, IonModal, ModalController } from "@ionic/angular";
+import { ActionSheetController, IonModal } from "@ionic/angular";
 import {
   OccurrenceTypeEnum,
   occurrenceTypeIconRecord,
@@ -47,8 +47,6 @@ export class FeedPage implements OnInit {
   private readonly actionSheetCtrl: ActionSheetController = inject(ActionSheetController);
 
   private readonly formBuilder: FormBuilder = inject(FormBuilder);
-
-  private readonly modalController: ModalController = inject(ModalController);
 
   private readonly mediaService: MediaService = inject(MediaService);
 
@@ -120,6 +118,11 @@ export class FeedPage implements OnInit {
   public async ionViewDidEnter(): Promise<void> {
     await this.getOccurrences();
     this.initMap();
+  }
+
+  public ionViewDidLeave(): void {
+    if (this.map)
+      this.map.remove();
   }
 
   public async closeInfoModal(): Promise<void> {
@@ -227,7 +230,10 @@ export class FeedPage implements OnInit {
   }
 
   private initMap(): void {
-    this.map = L.map('map', {
+    if (this.map)
+      this.map.remove();
+
+    this.map = L.map('mapHome', {
       zoom: 3,
       tap: true,
     }).setView([this.currentLocation.latitude, this.currentLocation.longitude], 15);
@@ -288,17 +294,6 @@ export class FeedPage implements OnInit {
     });
   }
 
-  // public async geocodeAddress(address: string): Promise<void> {
-  //   await this.geocoder.geocode({ address }, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
-  //     if (status === 'OK' && results) {
-  //       const location = results[0].geometry.location;
-  //       this.currentLocation.latitude = location.lat();
-  //       this.currentLocation.longitude = location.lng();
-  //       console.log('Latitude:', this.currentLocation.latitude);
-  //       console.log('Longitude:', this.currentLocation.longitude);
-  //     } else {
-  //       console.error('Geocode falhou devido a:', status);
-  //     }
-  //   });
-  // }
+  //#endregion
+
 }

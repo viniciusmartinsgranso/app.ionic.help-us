@@ -143,9 +143,15 @@ export class UserService {
     return this.currentUser$.getValue();
   }
 
-  public async getMe(): Promise<UserProxy> {
+  public async getMe(occurrences?: boolean): Promise<UserProxy> {
+    const url = createCrudUrl<UserProxy>(environment.api.routes.users.me, occurrences ? {
+      customParams: {
+        occurrences
+      },
+    } : {});
+
     const { error, success } = await this.http.get<UserProxy>(
-      environment.api.routes.users.me,
+      url
     );
 
     if (error || !success) throw new Error(getCrudErrors(error)[0]);
