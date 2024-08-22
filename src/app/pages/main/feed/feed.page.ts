@@ -14,6 +14,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MediaService } from "../../../services/media.service";
 import { UserService } from "../../../services/user.service";
 import { UserProxy } from "../../../models/proxies/user.proxy";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-feed',
@@ -52,6 +53,8 @@ export class FeedPage implements OnInit {
 
   private readonly userService: UserService = inject(UserService);
 
+  private readonly router: Router = inject(Router)
+
   //#endregion
 
   //#region Public Properties
@@ -61,6 +64,8 @@ export class FeedPage implements OnInit {
   @ViewChild('infoModal') infoModal?: IonModal;
 
   public map!: L.Map;
+
+  public mapMarkers: L.Marker[] = [];
 
   public currentLocation: LocationInterface = {
     latitude: 0,
@@ -109,10 +114,7 @@ export class FeedPage implements OnInit {
   public async ngOnInit(): Promise<void> {
     this.presentingElement = document.querySelector('.feed');
     await this.getOccurrences();
-    const user = await this.userService.getCurrentUserFromStorage();
-
-    if (user)
-      this.currentUser = user;
+    this.currentUser = await this.userService.getMe(true);
   }
 
   public async ionViewDidEnter(): Promise<void> {
@@ -215,6 +217,22 @@ export class FeedPage implements OnInit {
     return role !== 'gesture';
   }
 
+  public filterByUser(): void {
+    this.occurrences = this.currentUser.occurrences;
+
+    this.setPropertiesToMap();
+  }
+
+  public async getAllOccurrences(): Promise<void> {
+    await this.getOccurrences();
+
+    this.setPropertiesToMap();
+  }
+
+  public async redirectToLogout(): Promise<void> {
+    return void await this.router.navigateByUrl('logout');
+  }
+
   //#endregion
 
   //#Region Private Methods
@@ -255,7 +273,12 @@ export class FeedPage implements OnInit {
   }
 
   private setPropertiesToMap(): void {
+    for (const marker of this.mapMarkers) {
+      this.map.removeLayer(marker);
+    }
+
     const marker = L.marker([this.currentLocation.latitude, this.currentLocation.longitude], { icon: this.currentIcon }).addTo(this.map);
+    marker.addEventListener('click', e => console.log('Localização atual'))
 
     this.occurrences.forEach((occurrence) => {
       const icon = L.icon({
@@ -269,6 +292,9 @@ export class FeedPage implements OnInit {
       });
 
       const marker = L.marker([occurrence.latitude, occurrence.longitude], { icon }).addTo(this.map);
+
+      this.mapMarkers.push(marker);
+
       marker.addEventListener('click', async () => {
         const [response, message] = await this.userService.getOne(occurrence.userId);
 
@@ -283,9 +309,7 @@ export class FeedPage implements OnInit {
         this.occurrence = occurrence;
         this.isOpenInfoModal = true;
       });
-    })
-
-    marker.addEventListener('click', e => console.log('Localização atual'))
+    });
 
     this.map.addEventListener('click', (e) => {
       this.isOpenCreateAndEditModal = true;

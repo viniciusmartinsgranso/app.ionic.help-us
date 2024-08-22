@@ -45,11 +45,6 @@ const routes: Routes = [
     loadChildren: () => import('./main/logout/logout.module').then(m => m.LogoutPageModule)
   },
   {
-    path: 'profile',
-    loadChildren: () => import('./main/profile/profile.module').then(m => m.ProfilePageModule),
-    ...authenticatedRoute,
-  },
-  {
     path: '**',
     redirectTo: 'login',
     pathMatch: 'full'

@@ -13,9 +13,9 @@
     </div>
     <h3 style="color: var(--yellow-color)">Deseja realmente sair?</h3>
     <div class="logout--page--buttons">
-      <button class="no" (click)="router.navigate(['/feed'])">Quero continuar e ir pra página de feed!</button>
+      <button class="no" (click)="redirectToFeed()">Quero continuar e ir pra página de feed!</button>
 
-      <button class="yes" (click)="router.navigate(['/login'])">Desejo Sair!</button>
+      <button class="yes" (click)="onLogout()">Desejo Sair!</button>
     </div>
   </div>
 </div>

@@ -1,121 +1,139 @@
-<ion-content [fullscreen]="true">
-  <div class="feed">
-    <h3>As ocorrências perto de você:</h3>
-    <div id="mapHome"></div>
+<ion-content class="ion-padding feed">
 
-    <ion-modal #createModal [isOpen]="isOpenCreateAndEditModal" [canDismiss]="canDismiss"
-               [presentingElement]="presentingElement">
-      <ng-template>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button color="warning">
+      <ion-icon name="chevron-back"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="start">
+      <ion-fab-button color="warning" (click)="filterByUser()">
+        <ion-icon name="person-outline"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button color="warning" (click)="getAllOccurrences()">
+        <ion-icon name="globe-outline"></ion-icon>
+      </ion-fab-button>
 
-        <ion-header>
-          <ion-toolbar>
-            <ion-title>{{ isEdit ? 'Editar' : 'Criar' + ' ocorrência' }}</ion-title>
-            <ion-buttons slot="end">
-              <ion-button (click)="closeCreateModal()">Fechar</ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-header>
+      <ion-fab-button color="warning" (click)="redirectToLogout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
 
-        <ion-content>
-          <form class="new-occurrence" [formGroup]="formGroup">
-            <div class="new-occurrence--titles">
-              <h1>Tipo:</h1>
-              <ion-item>
-                <ion-select aria-label="Type"
-                            interface="popover"
-                            formControlName="type"
-                            placeholder="Tipo de ocorrência.">
-                  <ion-select-option
-                      [value]="occurrenceType.CAVE_IN">{{ translatedOccurrenceType[occurrenceType.CAVE_IN] }}
-                  </ion-select-option>
-                  <ion-select-option [value]="occurrenceType.CRASH">{{ translatedOccurrenceType[occurrenceType.CRASH] }}
-                  </ion-select-option>
-                  <ion-select-option [value]="occurrenceType.FIRE">{{ translatedOccurrenceType[occurrenceType.FIRE] }}
-                  </ion-select-option>
-                  <ion-select-option [value]="occurrenceType.COOP">{{ translatedOccurrenceType[occurrenceType.COOP] }}
-                  </ion-select-option>
-                </ion-select>
-              </ion-item>
-
-              <img [src]="getCurrentIconType()" alt=""/>
-            </div>
-
-            <div class="new-occurrence--form">
-              <img class="new-occurrence--form--icon" src="../../../../assets/images/text-occurrence.svg" alt="">
-              <input class="new-occurrence--form--input" type="text" placeholder="Título" formControlName="title">
-            </div>
-
-            <div class="new-occurrence--form">
-              <img class="description-image" src="../../../../assets/images/description-occurrence.svg" alt="">
-              <textarea class="new-occurrence--form--input" placeholder="Descrição" cols="3" rows="10"
-                        formControlName="description"></textarea>
-            </div>
-
-            <div class="new-occurrence--form">
-              <img class="new-occurrence--form--icon" src="../../../../assets/images/location-occurrence.svg" alt="">
-              <input class="new-occurrence--form--input" type="text" formControlName="location"
-                     placeholder="Localização">
-            </div>
-
-            <div class="new-occurrence--occurrence-image"
-                 [style.padding]="!formGroup.controls['photoUrl'].value ? '1rem 0 1rem 0' : '0'">
-              <label *ngIf="!formGroup.controls['photoUrl'].value" (click)="inputElement.click()"> Selecionar a imagem
-                da
-                ocorrência</label>
-              <input #inputElement type="file" (input)="uploadImage($event)" accept="image/png, image/jpg, image/jpeg">
-              <img [class.new-occurrence--occurrence-image--img]="formGroup.controls['photoUrl'].value"
-                   [src]="formGroup.controls['photoUrl'].value">
-            </div>
-
-            <button class="new-occurrence--submit" (click)="isEdit ? updateOccurrence() : postOccurrence()"
-                    [class.disable]="formGroup.invalid">Criar
-              ocorrência
-            </button>
-          </form>
-        </ion-content>
-      </ng-template>
-    </ion-modal>
-
-    <ion-modal #infoModal [isOpen]="isOpenInfoModal"
-               (willDismiss)="isOpenInfoModal = false; canEdit = false"
-               [initialBreakpoint]="0.5"
-               [breakpoints]="[0, 0.25, 0.5, 1]">
-      <ng-template>
-
-        <ion-header>
-          <ion-toolbar>
-            <ion-buttons *ngIf="canEdit" slot="start">
-              <ion-button color="medium" (click)="editOccurrence()">Editar</ion-button>
-            </ion-buttons>
-            <ion-title>{{ occurrence.title }}</ion-title>
-            <ion-buttons slot="end">
-              <ion-button (click)="closeInfoModal()">Fechar</ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-header>
-
-        <ion-content>
-          <div class="occurrence-info">
-            <div style="width: 100%;" class="all-center">
-              <ion-img class="occurrence-info--type" [src]="occurrenceWhiteIcon[occurrence.type]"></ion-img>
-            </div>
-
-            <div class="occurrence-info--user">
-              <ion-avatar>
-                <ion-img [src]="occurrence.user.photoUrl ?? '../../../../assets/images/user.jpg'"
-                         alt="Imagem"></ion-img>
-              </ion-avatar>
-              <div class="occurrence-info--user--about">
-                <label class="occurrence-info--user--about--name">{{ occurrence.user.name }}</label>
-                <label class="occurrence-info--user--about--city">{{ occurrence.user.city }}</label>
-              </div>
-            </div>
-            <label>{{ occurrence.location }}</label>
-            <label>{{ occurrence.description }}</label>
-            <img class="occurrence-info--image" *ngIf="occurrence.photoUrl" [src]="occurrence.photoUrl" alt=""/>
-          </div>
-        </ion-content>
-      </ng-template>
-    </ion-modal>
+  <h3>As ocorrências perto de você:</h3>
+  <div id="mapHome">
   </div>
+
+  <ion-modal #createModal [isOpen]="isOpenCreateAndEditModal" [canDismiss]="canDismiss"
+             [presentingElement]="presentingElement">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isEdit ? 'Editar' : 'Criar' + ' ocorrência' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeCreateModal()">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <form class="new-occurrence" [formGroup]="formGroup">
+          <div class="new-occurrence--titles">
+            <h1>Tipo:</h1>
+            <ion-item>
+              <ion-select aria-label="Type"
+                          interface="popover"
+                          formControlName="type"
+                          placeholder="Tipo de ocorrência.">
+                <ion-select-option
+                    [value]="occurrenceType.CAVE_IN">{{ translatedOccurrenceType[occurrenceType.CAVE_IN] }}
+                </ion-select-option>
+                <ion-select-option [value]="occurrenceType.CRASH">{{ translatedOccurrenceType[occurrenceType.CRASH] }}
+                </ion-select-option>
+                <ion-select-option [value]="occurrenceType.FIRE">{{ translatedOccurrenceType[occurrenceType.FIRE] }}
+                </ion-select-option>
+                <ion-select-option [value]="occurrenceType.COOP">{{ translatedOccurrenceType[occurrenceType.COOP] }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <img [src]="getCurrentIconType()" alt=""/>
+          </div>
+
+          <div class="new-occurrence--form">
+            <img class="new-occurrence--form--icon" src="../../../../assets/images/text-occurrence.svg" alt="">
+            <input class="new-occurrence--form--input" type="text" placeholder="Título" formControlName="title">
+          </div>
+
+          <div class="new-occurrence--form">
+            <img class="description-image" src="../../../../assets/images/description-occurrence.svg" alt="">
+            <textarea class="new-occurrence--form--input" placeholder="Descrição" cols="3" rows="10"
+                      formControlName="description"></textarea>
+          </div>
+
+          <div class="new-occurrence--form">
+            <img class="new-occurrence--form--icon" src="../../../../assets/images/location-occurrence.svg" alt="">
+            <input class="new-occurrence--form--input" type="text" formControlName="location"
+                   placeholder="Localização">
+          </div>
+
+          <div class="new-occurrence--occurrence-image"
+               [style.padding]="!formGroup.controls['photoUrl'].value ? '1rem 0 1rem 0' : '0'">
+            <label *ngIf="!formGroup.controls['photoUrl'].value" (click)="inputElement.click()"> Selecionar a imagem
+              da
+              ocorrência</label>
+            <input #inputElement type="file" (input)="uploadImage($event)" accept="image/png, image/jpg, image/jpeg">
+            <img [class.new-occurrence--occurrence-image--img]="formGroup.controls['photoUrl'].value"
+                 [src]="formGroup.controls['photoUrl'].value">
+          </div>
+
+          <button class="new-occurrence--submit" (click)="isEdit ? updateOccurrence() : postOccurrence()"
+                  [class.disable]="formGroup.invalid">Criar
+            ocorrência
+          </button>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal #infoModal [isOpen]="isOpenInfoModal"
+             (willDismiss)="isOpenInfoModal = false; canEdit = false"
+             [initialBreakpoint]="0.5"
+             [breakpoints]="[0, 0.25, 0.5, 1]">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons *ngIf="canEdit" slot="start">
+            <ion-button color="medium" (click)="editOccurrence()">Editar</ion-button>
+          </ion-buttons>
+          <ion-title>{{ occurrence.title }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeInfoModal()">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <div class="occurrence-info">
+          <div style="width: 100%;" class="all-center">
+            <ion-img class="occurrence-info--type" [src]="occurrenceWhiteIcon[occurrence.type]"></ion-img>
+          </div>
+
+          <div class="occurrence-info--user">
+            <ion-avatar>
+              <ion-img [src]="occurrence.user.photoUrl ?? '../../../../assets/images/user.jpg'"
+                       alt="Imagem"></ion-img>
+            </ion-avatar>
+            <div class="occurrence-info--user--about">
+              <label class="occurrence-info--user--about--name">{{ occurrence.user.name }}</label>
+              <label class="occurrence-info--user--about--city">{{ occurrence.user.city }}</label>
+            </div>
+          </div>
+          <label>{{ occurrence.location }}</label>
+          <label>{{ occurrence.description }}</label>
+          <img class="occurrence-info--image" *ngIf="occurrence.photoUrl" [src]="occurrence.photoUrl" alt=""/>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
