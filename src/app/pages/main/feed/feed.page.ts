@@ -15,6 +15,7 @@ import { MediaService } from "../../../services/media.service";
 import { UserService } from "../../../services/user.service";
 import { UserProxy } from "../../../models/proxies/user.proxy";
 import { Router } from "@angular/router";
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-feed',
@@ -24,9 +25,9 @@ import { Router } from "@angular/router";
 export class FeedPage implements OnInit {
 
   constructor() {
-    navigator.geolocation.getCurrentPosition((e) => this.setGeolocation(e.coords),
+    navigator.geolocation.watchPosition((e) => this.setGeolocation(e.coords),
       async () => await this.helperService.showAlert('Atenção, você não aceitou a localização.', ['Ok']),
-      { timeout: 40000 });
+      { timeout: 10000 });
 
     this.formGroup = this.formBuilder.nonNullable.group({
       title: ['', [Validators.required, Validators.minLength(4)]],
@@ -57,11 +58,7 @@ export class FeedPage implements OnInit {
 
   //#endregion
 
-  //#region Public Properties
-
-  @ViewChild('createModal') createModal?: IonModal;
-
-  @ViewChild('infoModal') infoModal?: IonModal;
+  //#region Map Properties
 
   public map!: L.Map;
 
@@ -80,6 +77,16 @@ export class FeedPage implements OnInit {
     shadowAnchor: [4, 7],
     popupAnchor: [-3, -131]
   });
+
+  public currentMarker!: L.Marker;
+
+  //#endregion
+
+  //#region Public Properties
+
+  @ViewChild('createModal') createModal?: IonModal;
+
+  @ViewChild('infoModal') infoModal?: IonModal;
 
   public occurrences: OccurrenceProxy[] = [];
 
@@ -104,8 +111,6 @@ export class FeedPage implements OnInit {
   public canEdit: boolean = false;
 
   public isEdit: boolean = false;
-
-  // public geocoder: google.maps.Geocoder = new google.maps.Geocoder();
 
   //#endregion
 
@@ -219,12 +224,14 @@ export class FeedPage implements OnInit {
 
   public filterByUser(): void {
     this.occurrences = this.currentUser.occurrences;
+    this.map.setView([this.currentLocation.latitude, this.currentLocation.longitude]);
 
     this.setPropertiesToMap();
   }
 
   public async getAllOccurrences(): Promise<void> {
     await this.getOccurrences();
+    this.map.setView([this.currentLocation.latitude, this.currentLocation.longitude]);
 
     this.setPropertiesToMap();
   }
@@ -268,17 +275,24 @@ export class FeedPage implements OnInit {
   }
 
   private setGeolocation(geo: GeolocationCoordinates): void {
+    if (this.currentMarker)
+      this.map.removeLayer(this.currentMarker);
+
     this.currentLocation.longitude = geo.longitude;
     this.currentLocation.latitude = geo.latitude;
+
+    console.log(this.currentLocation);
+
+    const marker = L.marker([this.currentLocation.latitude, this.currentLocation.longitude], { icon: this.currentIcon }).addTo(this.map);
+    this.currentMarker = marker;
+
+    marker.addEventListener('click', e => console.log('Localização atual'))
   }
 
   private setPropertiesToMap(): void {
     for (const marker of this.mapMarkers) {
       this.map.removeLayer(marker);
     }
-
-    const marker = L.marker([this.currentLocation.latitude, this.currentLocation.longitude], { icon: this.currentIcon }).addTo(this.map);
-    marker.addEventListener('click', e => console.log('Localização atual'))
 
     this.occurrences.forEach((occurrence) => {
       const icon = L.icon({

@@ -1,6 +1,8 @@
 .feed {
   --background: var(--black-color);
   --overflow: hidden;
+  --padding-top: --ion-safe-area-top;
+  --padding-bottom: --ion-safe-area-bottom;
 }
 
 #mapHome {
