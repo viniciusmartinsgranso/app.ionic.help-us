@@ -48,7 +48,10 @@ export class AuthService {
   }
 
   public async logout(): Promise<void> {
-    await this.storage.clear();
+    await Promise.all([
+      this.storage.remove(environment.keys.token),
+      this.storage.remove(environment.keys.user),
+    ]);
 
     await this.router.navigateByUrl('/login');
   }
