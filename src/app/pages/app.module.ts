@@ -18,7 +18,6 @@ import { GoogleMapsModule } from "@angular/google-maps";
     AppRoutingModule,
     HttpAsyncModule,
     HttpClientModule,
-    GoogleMapsModule,
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
