@@ -69,11 +69,15 @@ export class UserService {
     return [success];
   }
 
-  public update(user: UserProxy): void {
-    // const storage = JSON.parse(localStorage.getItem('users'));
-    //
-    // storage.push(user[0]);
-    // localStorage.setItem('users', JSON.stringify(storage));
+  public async update(id: number, payload: Partial<UserProxy>): Promise<[UserProxy | boolean, string?]> {
+    const url = createCrudUrl(environment.api.routes.users.update.replace('{id}', String(id)));
+
+    const { success, error } = await this.http.patch<UserProxy>(url, payload);
+
+    if (!success || error)
+      return [false, getCrudErrors(error)[0]]
+
+    return [success];
   }
 
   public async delete(user: number): Promise<void> {

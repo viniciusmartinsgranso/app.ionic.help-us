@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { FeedPageRoutingModule } from './feed-routing.module';
 
 import { FeedPage } from './feed.page';
+import { PopoverModule } from "../../../components/popovers/popover/popover.module";
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { FeedPage } from './feed.page';
     IonicModule,
     FeedPageRoutingModule,
     ReactiveFormsModule,
+    PopoverModule
   ],
   declarations: [FeedPage],
 })

@@ -1,31 +1,44 @@
 <ion-content class="ion-padding feed">
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button id="click-trigger" color="warning">
+    <ion-fab-button id="click-trigger" color="warning" (click)="openPopovers($event)">
       <ion-icon name="chevron-up"></ion-icon>
     </ion-fab-button>
+
     <ion-fab-list side="top">
-      <ion-fab-button color="warning" (click)="filterByUser()">
-        <ion-icon name="person-outline"></ion-icon>
+      <ng-container *ngIf="!isInvited">
+        <ion-fab-button color="warning"
+                        id="user-trigger"
+                        (click)="filterByUser()">
+          <ion-icon name="person-outline"></ion-icon>
+        </ion-fab-button>
 
-        <ion-popover trigger="click-trigger"
-                     side="left" alignment="start"
-                     [dismissOnSelect]="true"
-                     triggerAction="click"
-        >
-          <ng-template>
-            <ion-content class="ion-padding">Hello World!</ion-content>
-          </ng-template>
-        </ion-popover>
-      </ion-fab-button>
-      <ion-fab-button color="warning" (click)="getAllOccurrences()">
-        <ion-icon name="globe-outline"></ion-icon>
-      </ion-fab-button>
+        <ion-fab-button color="warning"
+                        id="person-trigger"
+                        (click)="personEdit()">
+          <ion-icon name="accessibility-outline"></ion-icon>
+        </ion-fab-button>
 
-      <ion-fab-button color="warning" (click)="redirectToLogout()">
+        <ion-fab-button color="warning"
+                        id="globe-trigger"
+                        (click)="getAllOccurrences()">
+          <ion-icon name="globe-outline"></ion-icon>
+        </ion-fab-button>
+      </ng-container>
+
+      <ion-fab-button color="warning"
+                      id="logout-trigger"
+                      (click)="redirectToLogout()">
         <ion-icon name="log-out-outline"></ion-icon>
       </ion-fab-button>
+
     </ion-fab-list>
+  </ion-fab>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+    <ion-fab-button color="warning" (click)="reloadPage()">
+      <ion-icon name="reload-outline"></ion-icon>
+    </ion-fab-button>
   </ion-fab>
 
   <h3>As ocorrências perto de você:</h3>
@@ -146,4 +159,56 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+
+  <ion-modal #editUserModal [isOpen]="isOpenUserModal"
+             [canDismiss]="canDismiss"
+             [presentingElement]="presentingElement">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Editar usuário.</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeUserModal()">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <form class="new-occurrence" [formGroup]="userFormGroup">
+          <div class="new-occurrence--form">
+            <img class="new-occurrence--form--icon" src="../../../../assets/images/user-login-icon.svg" alt="">
+            <input class="new-occurrence--form--input" type="text" placeholder="Nome" formControlName="name">
+          </div>
+
+          <div class="new-occurrence--form">
+            <img class="new-occurrence--form--icon" src="../../../../assets/images/user-login-icon.svg" alt="">
+            <input class="new-occurrence--form--input" type="text" formControlName="email"
+                   placeholder="Email">
+          </div>
+
+          <div class="new-occurrence--form">
+            <img class="new-occurrence--form--icon" src="../../../../assets/images/location-occurrence.svg" alt="">
+            <input class="new-occurrence--form--input" type="text" formControlName="city"
+                   placeholder="Cidade">
+          </div>
+
+          <div class="new-occurrence--occurrence-image"
+               [style.padding]="!userFormGroup.controls['photoUrl'].value ? '1rem 0 1rem 0' : '0'">
+            <label *ngIf="!userFormGroup.controls['photoUrl'].value" (click)="inputElement.click()"> Selecionar a imagem
+              de perfil</label>
+            <input #inputElement type="file" (input)="uploadImage($event)" accept="image/png, image/jpg, image/jpeg">
+            <img [class.new-occurrence--occurrence-image--img]="userFormGroup.controls['photoUrl'].value"
+                 [src]="userFormGroup.controls['photoUrl'].value">
+          </div>
+
+          <button class="new-occurrence--submit"
+                  (click)="updateUser()"
+                  [class.disable]="userFormGroup.invalid">Atualizar
+          </button>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>

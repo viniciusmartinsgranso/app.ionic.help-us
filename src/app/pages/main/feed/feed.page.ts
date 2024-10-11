@@ -1,21 +1,23 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { OccurrenceService } from "../../../services/occurrence.service";
 import { HelperService } from "../../../services/helper";
 import { LocationInterface } from "../../../models/interfaces/location.interface";
 import { OccurrenceProxy } from "../../../models/proxies/occurrence.proxy";
-import { ActionSheetController, IonModal } from "@ionic/angular";
+import { ActionSheetController, IonModal, PopoverController } from "@ionic/angular";
 import {
   OccurrenceTypeEnum,
   occurrenceTypeIconRecord,
-  occurrenceTypeTranslate, occurrenceTypeWhiteImage
+  occurrenceTypeTranslate,
+  occurrenceTypeWhiteImage
 } from "../../../models/enums/occurrence-type.enum";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MediaService } from "../../../services/media.service";
 import { UserService } from "../../../services/user.service";
 import { UserProxy } from "../../../models/proxies/user.proxy";
 import { Router } from "@angular/router";
-import { Geolocation } from '@capacitor/geolocation';
+import { PopoverComponent } from "../../../components/popovers/popover/popover.component";
+import { RolesEnum } from "../../../models/enums/roles.enum";
 
 @Component({
   selector: 'app-feed',
@@ -38,6 +40,13 @@ export class FeedPage implements OnInit {
       type: [null, Validators.required],
       photoUrl: [null]
     });
+
+    this.userFormGroup = this.formBuilder.group({
+      name: [''],
+      email: [''],
+      city: [''],
+      photoUrl: ['']
+    });
   }
 
   //#region Injection Services
@@ -55,6 +64,8 @@ export class FeedPage implements OnInit {
   private readonly userService: UserService = inject(UserService);
 
   private readonly router: Router = inject(Router)
+
+  private readonly popoverController: PopoverController = inject(PopoverController);
 
   //#endregion
 
@@ -88,6 +99,8 @@ export class FeedPage implements OnInit {
 
   @ViewChild('infoModal') infoModal?: IonModal;
 
+  @ViewChild('editUserModal') editUserModal?: IonModal;
+
   public occurrences: OccurrenceProxy[] = [];
 
   public isOpenCreateAndEditModal: boolean = false;
@@ -97,6 +110,8 @@ export class FeedPage implements OnInit {
   public presentingElement: any;
 
   public formGroup: FormGroup;
+
+  public userFormGroup: FormGroup;
 
   public occurrenceType: typeof OccurrenceTypeEnum = OccurrenceTypeEnum;
 
@@ -112,6 +127,12 @@ export class FeedPage implements OnInit {
 
   public isEdit: boolean = false;
 
+  public showPopover: boolean = false;
+
+  public isInvited: boolean = false;
+
+  public isOpenUserModal: boolean = false;
+
   //#endregion
 
   //#Region Public Methods
@@ -120,6 +141,8 @@ export class FeedPage implements OnInit {
     this.presentingElement = document.querySelector('.feed');
     await this.getOccurrences();
     this.currentUser = await this.userService.getMe(true);
+
+    this.isInvited = this.currentUser.roles.includes(RolesEnum.NONE);
   }
 
   public async ionViewDidEnter(): Promise<void> {
@@ -128,8 +151,10 @@ export class FeedPage implements OnInit {
   }
 
   public ionViewDidLeave(): void {
-    if (this.map)
-      this.map.remove();
+    this.map.eachLayer(e => e.removeFrom(this.map))
+    this.map.remove();
+    this.map.off()
+    this.map.eachLayer(e => console.log(e))
   }
 
   public async closeInfoModal(): Promise<void> {
@@ -159,6 +184,31 @@ export class FeedPage implements OnInit {
 
     if (!this.isOpenCreateAndEditModal)
       this.formGroup.reset();
+  }
+
+  public async closeUserModal(): Promise<void> {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Deseja mesmo sair?',
+      buttons: [
+        {
+          text: 'Sim',
+          role: 'confirm',
+        },
+        {
+          text: 'Não',
+          role: 'cancel',
+        },
+      ],
+    });
+
+    await actionSheet.present();
+
+    const { role } = await actionSheet.onWillDismiss();
+
+    this.isOpenUserModal = role !== 'confirm';
+
+    if (!this.isOpenUserModal)
+      this.userFormGroup.reset();
   }
 
   public getCurrentIconType(): string {
@@ -192,7 +242,7 @@ export class FeedPage implements OnInit {
     if (!success)
       return await this.helperService.showToast(media);
 
-    this.formGroup.controls['photoUrl'].setValue(media);
+     this.isOpenUserModal ? this.userFormGroup.controls['photoUrl'].setValue(media) : this.formGroup.controls['photoUrl'].setValue(media);
   }
 
   public editOccurrence(): void {
@@ -222,7 +272,8 @@ export class FeedPage implements OnInit {
     return role !== 'gesture';
   }
 
-  public filterByUser(): void {
+  public async filterByUser(): Promise<void> {
+    this.currentUser = await this.userService.getMe(true);
     this.occurrences = this.currentUser.occurrences;
     this.map.setView([this.currentLocation.latitude, this.currentLocation.longitude]);
 
@@ -238,6 +289,77 @@ export class FeedPage implements OnInit {
 
   public async redirectToLogout(): Promise<void> {
     return void await this.router.navigateByUrl('logout');
+  }
+
+  public async openPopovers(e: Event): Promise<void> {
+    this.showPopover = !this.showPopover;
+
+    if (!this.showPopover) {
+      return;
+    }
+
+    const userPop: Event = {
+      ...e,
+      target: document.getElementById('user-trigger'),
+    };
+
+    const globalPop: Event = {
+      ...e,
+      target: document.getElementById('globe-trigger'),
+    };
+
+    const logoutPop: Event = {
+      ...e,
+      target: document.getElementById('logout-trigger'),
+    };
+
+    const personPop: Event = {
+      ...e,
+      target: document.getElementById('person-trigger'),
+    };
+
+    if (this.isInvited) {
+      const log = await this.createPopover(logoutPop, 'Sair da conta');
+      return void await log.present();
+    }
+
+    const popovers = await Promise.all([
+      this.createPopover(userPop, 'Filtro por usuário'),
+      this.createPopover(globalPop, 'Todas as ocorrências'),
+      this.createPopover(logoutPop, 'Sair da conta'),
+      this.createPopover(personPop, 'Editar perfil')
+    ]);
+
+    for (const popover of popovers) {
+      await popover.present();
+    }
+  }
+
+  public reloadPage(): void {
+    window.location.reload();
+  }
+
+  public personEdit(): void {
+    this.userFormGroup.patchValue({
+      name: this.currentUser.name,
+      email: this.currentUser.email,
+      city: this.currentUser.city,
+      photoUrl: this.currentUser.photoUrl,
+    });
+
+    this.isOpenUserModal = true;
+  }
+
+  public async updateUser(): Promise<void> {
+    const payload = this.userFormGroup.getRawValue();
+
+    const [success, message] = await this.userService.update(this.currentUser.id, payload);
+
+    if (!success && message) {
+      return void await this.helperService.showToast(message);
+    }
+
+    return void this.helperService.showToast('Usuário atualizado com sucesso!');
   }
 
   //#endregion
@@ -280,8 +402,6 @@ export class FeedPage implements OnInit {
 
     this.currentLocation.longitude = geo.longitude;
     this.currentLocation.latitude = geo.latitude;
-
-    console.log(this.currentLocation);
 
     const marker = L.marker([this.currentLocation.latitude, this.currentLocation.longitude], { icon: this.currentIcon }).addTo(this.map);
     this.currentMarker = marker;
@@ -329,6 +449,17 @@ export class FeedPage implements OnInit {
       this.isOpenCreateAndEditModal = true;
       this.formGroup.controls['latitude'].setValue(e.latlng.lat);
       this.formGroup.controls['longitude'].setValue(e.latlng.lng);
+    });
+  }
+
+  private createPopover(event: Event, content: string): Promise<HTMLIonPopoverElement> {
+    return this.popoverController.create({
+      component: PopoverComponent,
+      componentProps: {
+        content
+      },
+      event,
+      side: 'left',
     });
   }
 

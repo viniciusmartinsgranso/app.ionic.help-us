@@ -7,7 +7,7 @@ export const apiRoutes = {
     create: '/users',
     getMany: '/users',
     me: '/users/me',
-    update: '/users/one/{id}',
+    update: '/users/{id}',
     one: '/users/one/{id}',
   },
   occurrences: {
