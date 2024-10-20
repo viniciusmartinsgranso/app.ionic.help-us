@@ -133,13 +133,16 @@ export class FeedPage implements OnInit {
 
   public isOpenUserModal: boolean = false;
 
+  public isLoading: boolean = false;
+
   //#endregion
 
   //#Region Public Methods
 
   public async ngOnInit(): Promise<void> {
+    this.isLoading = true;
+
     this.presentingElement = document.querySelector('.feed');
-    await this.getOccurrences();
     this.currentUser = await this.userService.getMe(true);
 
     this.isInvited = this.currentUser.roles.includes(RolesEnum.NONE);
@@ -148,6 +151,8 @@ export class FeedPage implements OnInit {
   public async ionViewDidEnter(): Promise<void> {
     await this.getOccurrences();
     this.initMap();
+
+    this.isLoading = false;
   }
 
   public ionViewDidLeave(): void {
@@ -217,16 +222,22 @@ export class FeedPage implements OnInit {
 
   public async postOccurrence(): Promise<void> {
     const payload = this.formGroup.getRawValue();
+    this.isLoading = true;
+
     const [canCreate, message] = await this.occurrenceService.create(payload);
 
-    if (!canCreate && message)
+    if (!canCreate && message) {
+      this.isLoading = false;
       return void await this.helperService.showToast(message);
+    }
 
     await this.helperService.showToast('Ocorrência criada com sucesso!');
     this.isOpenCreateAndEditModal = false;
 
     await this.getOccurrences();
     this.setPropertiesToMap();
+
+    this.isLoading = false;
   }
 
   public async uploadImage(event: Event): Promise<void> {
@@ -353,7 +364,11 @@ export class FeedPage implements OnInit {
   public async updateUser(): Promise<void> {
     const payload = this.userFormGroup.getRawValue();
 
+    this.isLoading = true;
+
     const [success, message] = await this.userService.update(this.currentUser.id, payload);
+
+    this.isLoading = false;
 
     if (!success && message) {
       return void await this.helperService.showToast(message);
@@ -406,7 +421,7 @@ export class FeedPage implements OnInit {
     const marker = L.marker([this.currentLocation.latitude, this.currentLocation.longitude], { icon: this.currentIcon }).addTo(this.map);
     this.currentMarker = marker;
 
-    marker.addEventListener('click', e => console.log('Localização atual'))
+    marker.addEventListener('click', e => this.helperService.showToast('Sua localização.'))
   }
 
   private setPropertiesToMap(): void {

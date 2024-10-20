@@ -1,5 +1,7 @@
 <ion-content class="ion-padding feed">
 
+  <app-loading *ngIf="isLoading"></app-loading>
+
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button id="click-trigger" color="warning" (click)="openPopovers($event)">
       <ion-icon name="chevron-up"></ion-icon>
@@ -59,6 +61,8 @@
       </ion-header>
 
       <ion-content>
+        <app-loading *ngIf="isLoading"></app-loading>
+
         <form class="new-occurrence" [formGroup]="formGroup">
           <div class="new-occurrence--titles">
             <h1>Tipo:</h1>
@@ -74,7 +78,9 @@
                 </ion-select-option>
                 <ion-select-option [value]="occurrenceType.FIRE">{{ translatedOccurrenceType[occurrenceType.FIRE] }}
                 </ion-select-option>
-                <ion-select-option [value]="occurrenceType.COOP">{{ translatedOccurrenceType[occurrenceType.COOP] }}
+                <ion-select-option [value]="occurrenceType.WINDS">{{ translatedOccurrenceType[occurrenceType.WINDS] }}
+                </ion-select-option>
+                <ion-select-option [value]="occurrenceType.SHOOTING">{{ translatedOccurrenceType[occurrenceType.SHOOTING] }}
                 </ion-select-option>
               </ion-select>
             </ion-item>
@@ -110,8 +116,8 @@
           </div>
 
           <button class="new-occurrence--submit" (click)="isEdit ? updateOccurrence() : postOccurrence()"
-                  [class.disable]="formGroup.invalid">Criar
-            ocorrência
+                  [class.disable]="formGroup.invalid">
+            {{ isEdit ? 'Editar' : 'Criar' + ' ocorrência' }}
           </button>
         </form>
       </ion-content>
@@ -175,6 +181,9 @@
       </ion-header>
 
       <ion-content>
+
+        <app-loading *ngIf="isLoading"></app-loading>
+
         <form class="new-occurrence" [formGroup]="userFormGroup">
           <div class="new-occurrence--form">
             <img class="new-occurrence--form--icon" src="../../../../assets/images/user-login-icon.svg" alt="">
