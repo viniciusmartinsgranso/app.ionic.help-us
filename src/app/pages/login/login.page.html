@@ -28,7 +28,9 @@
     <img src="../../../assets/images/line.svg" alt="">
   </div>
 
-  <button class="login--invited" (click)="invitedLogin()">ENTRAR COMO CONVIDADO</button>
+  <button class="login--invited" (click)="invitedLogin()">
+    {{ isLoading ? 'Carregando...' : 'ENTRAR COMO CONVIDADO' }}
+  </button>
 
 <!--  <div class="login&#45;&#45;developed">-->
 <!--    <h5>-->

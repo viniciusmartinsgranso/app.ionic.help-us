@@ -19,7 +19,7 @@ export const occurrenceTypeTranslate: Record<OccurrenceTypeEnum, string> = {
   [OccurrenceTypeEnum.FIRE]: 'Incendio',
   [OccurrenceTypeEnum.CAVE_IN]: 'Desmoronamento',
   [OccurrenceTypeEnum.WINDS]: 'Vento Forte',
-  [OccurrenceTypeEnum.SHOOTING]: 'Desmoronamento',
+  [OccurrenceTypeEnum.SHOOTING]: 'Tiroteiro',
 };
 
 export const occurrenceTypeWhiteImage: Record<OccurrenceTypeEnum, string> = {
