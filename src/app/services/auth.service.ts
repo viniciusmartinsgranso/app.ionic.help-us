@@ -62,7 +62,6 @@ export class AuthService {
     return await this.http.get(environment.api.routes.auth.google);
   }
 
-  /** Persiste o JWT após OAuth no popup e carrega o usuário (equivalente ao login). */
   public async completeGoogleSession(token: string): Promise<[boolean, string]> {
     try {
       await this.storage.setItem<JwtTokenProxy>(
