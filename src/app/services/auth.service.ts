@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   public async googleLogin(): Promise<AsyncResult<GoogleAuthorizationUrl>> {
-    return await this.http.post(environment.api.routes.auth.google, {});
+    return await this.http.get(environment.api.routes.auth.google);
   }
 
   /** Persiste o JWT após OAuth no popup e carrega o usuário (equivalente ao login). */
