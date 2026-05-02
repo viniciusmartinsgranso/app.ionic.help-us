@@ -107,7 +107,7 @@ export class LoginPage implements OnDestroy {
   private attachGoogleOAuthListener(): void {
     this.detachGoogleOAuthListener();
 
-    this.googleOAuthListener = (event: MessageEvent) => {
+    this.googleOAuthListener = async (event: MessageEvent) => {
       if (event.origin !== window.location.origin) {
         await this.helperService.showToast(
           'Não foi possível entrar com Google.',
