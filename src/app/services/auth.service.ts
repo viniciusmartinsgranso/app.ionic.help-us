@@ -6,6 +6,8 @@ import { StorageService } from './storage.service';
 import { getCrudErrors } from '../utils/functions';
 import { UserService } from "./user.service";
 import { Router } from "@angular/router";
+import { AsyncResult } from "../modules/http-async/models/async-result";
+import { GoogleAuthorizationUrl } from "../models/proxies/google.proxy";
 
 @Injectable({
   providedIn: 'root'
@@ -54,5 +56,23 @@ export class AuthService {
     ]);
 
     await this.router.navigateByUrl('/login');
+  }
+
+  public async googleLogin(): Promise<AsyncResult<GoogleAuthorizationUrl>> {
+    return await this.http.post(environment.api.routes.auth.google, {});
+  }
+
+  /** Persiste o JWT após OAuth no popup e carrega o usuário (equivalente ao login). */
+  public async completeGoogleSession(token: string): Promise<[boolean, string]> {
+    try {
+      await this.storage.setItem<JwtTokenProxy>(
+        environment.keys.token,
+        { token } as JwtTokenProxy,
+      );
+      await this.userService.getMeAndSaveInStorage();
+      return [true, 'Bem-vindo!'];
+    } catch {
+      return [false, 'Não foi possível carregar seu perfil.'];
+    }
   }
 }

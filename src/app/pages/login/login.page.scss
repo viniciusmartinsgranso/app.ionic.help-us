@@ -83,6 +83,16 @@
     font-size: 1.1rem;
   }
 
+  &--google {
+    background: transparent;
+    border: 0.1rem solid var(--yellow-color);
+    width: auto;
+    padding: .4rem;
+    border-radius: 0.5rem;
+    color: var(--yellow-color);
+    font-size: 1.1rem;
+  }
+
   &--developed {
     color: #707070;
     display: flex;

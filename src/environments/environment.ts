@@ -7,8 +7,8 @@ import { apiRoutes } from "./apiRoutes";
 export const environment = {
   production: false,
   api: {
-    apiBaseUrl: 'https://api-nestjs-help-us.onrender.com',
-    // apiBaseUrl: 'http://localhost:3000',
+    // apiBaseUrl: 'https://api-nestjs-help-us.onrender.com',
+    apiBaseUrl: 'http://localhost:3000',
     routes: apiRoutes
   },
   keys: {

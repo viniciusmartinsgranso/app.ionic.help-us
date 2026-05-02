@@ -31,6 +31,14 @@ const routes: Routes = [
     ...unAuthenticatedRoute
   },
   {
+    path: 'oauth-google-callback',
+    loadChildren: () =>
+      import('./google-oauth-callback/google-oauth-callback.module').then(
+        (m) => m.GoogleOAuthCallbackPageModule,
+      ),
+    ...unAuthenticatedRoute,
+  },
+  {
     path: 'feed',
     loadChildren: () => import('./main/feed/feed.module').then(m => m.FeedPageModule),
     ...authenticatedRoute

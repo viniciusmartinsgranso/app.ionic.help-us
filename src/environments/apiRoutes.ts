@@ -2,6 +2,8 @@ export const apiRoutes = {
   auth: {
     login: '/auth/login',
     invited: '/auth/invited',
+    google: '/auth/google',
+    googleCallback: '/auth/google/callback',
   },
   users: {
     create: '/users',
